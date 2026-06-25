@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MiliSoin - Espace Patient</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .screen { display: none; }
+        .screen.active { display: block; }
+        
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: linear-gradient(135deg, #f0f2f5, #e7f3ff);
+        }
+        
+        .auth-box {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .auth-header {
+            background: linear-gradient(135deg, #2c5aa0, #1e3a6f);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+            border-bottom: 1px solid #1e3a6f;
+        }
+        .auth-header i { font-size: 44px; margin-bottom: 6px; color: #fff; }
+        .auth-header h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: #fff; }
+        .auth-header p { font-size: 13px; opacity: 0.9; }
+        
+        .auth-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            color: #666;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .auth-tab.active {
+            color: #2c5aa0;
+            background: white;
+            border-bottom-color: #2c5aa0;
+        }
+        .auth-tab i { margin-right: 6px; }
+        
+        .auth-body { padding: 20px 18px; max-height: 70vh; overflow-y: auto; }
+        .auth-body::-webkit-scrollbar { width: 4px; }
+        .auth-body::-webkit-scrollbar-track { background: #f0f2f5; }
+        .auth-body::-webkit-scrollbar-thumb { background: #2c5aa0; border-radius: 10px; }
+        
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group label .required { color: #dc3545; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fff;
+            color: #333;
+            transition: 0.15s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-group input::placeholder { color: #999; }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #2c5aa0;
+            box-shadow: 0 0 0 3px rgba(44,90,160,0.15);
+        }
+        .form-group select option { background: #fff; color: #333; }
+        
+        .form-group input[type="date"] { color-scheme: light; }
+        .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5aa0, #1e3a6f);
+            color: white;
+            width: 100%;
+            border: 1px solid #1e3a6f;
+        }
+        .btn-primary:hover { background: linear-gradient(135deg, #1e3a6f, #2c5aa0); transform: translateY(-1px); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .btn-google {
+            background: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-google:hover { background: #f8f9fa; }
+        
+        .btn-secondary { background: #6c757d; color: white; border: 1px solid #5a6268; }
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            border: 1px solid #1e7e34;
+        }
+        .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 8px; }
+        
+        .divider {
+            text-align: center;
+            margin: 16px 0;
+            position: relative;
+            color: #999;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 38%;
+            height: 1px;
+            background: #ddd;
+        }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        
+        .top-bar {
+            background: linear-gradient(135deg, #2c5aa0, #1e3a6f);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-bottom: 1px solid #1e3a6f;
+        }
+        .top-bar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .top-bar-left i { font-size: 22px; color: #fff; }
+        .top-bar-left h1 { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; }
+        
+        .firebase-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .firebase-status .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .logout-btn:hover { background: white; color: #2c5aa0; }
+        
+        .dashboard-content { padding: 16px; max-width: 600px; margin: 0 auto; }
+        
+        .carte-wrapper { margin-bottom: 20px; }
+        .carte {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            min-height: 360px;
+        }
+        .fond-drapeau {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.5;
+        }
+        .bandes-obliques {
+            position: absolute;
+            top: -30%; left: -10%;
+            width: 120%; height: 160%;
+            background: linear-gradient(
+                135deg,
+                transparent 41%,
+                rgba(224, 82, 6, 0.25) 43%,
+                rgba(224, 82, 6, 0.25) 46%,
+                rgba(255, 255, 255, 0.7) 46%,
+                rgba(255, 255, 255, 0.7) 50%,
+                rgba(13, 177, 53, 0.25) 50%,
+                rgba(13, 177, 53, 0.25) 53%,
+                transparent 55%
+            );
+        }
+        .disque-soleil {
+            position: absolute;
+            top: 49%; left: 48.5%;
+            width: 32px; height: 32px;
+            background: rgba(224, 82, 6, 0.35);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        .contenu {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .en-tete { text-align: center; margin-bottom: 2px; }
+        .en-tete h1 { font-size: 15px; font-weight: 800; text-transform: uppercase; color: #000; letter-spacing: 1px; }
+        .en-tete h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #000; letter-spacing: 0.5px; }
+        .titre-carte { text-align: center; font-size: 16px; font-weight: 800; text-transform: uppercase; margin: 4px 0 10px; color: #0b132b; letter-spacing: 0.5px; }
+        .champs-container { display: flex; flex-direction: column; gap: 6px; }
+        .ligne { display: flex; align-items: flex-end; font-size: 13px; font-weight: 700; color: #000; }
+        .label { white-space: nowrap; margin-right: 6px; color: #666; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .pointilles { flex-grow: 1; border-bottom: 2px dotted #000; margin-bottom: 2px; min-width: 30px; padding-bottom: 2px; color: #2c5aa0; font-weight: 600; font-size: 13px; }
+        .pied-carte { display: flex; justify-content: space-between; align-items: flex-end; font-size: 13px; font-weight: 700; color: #000; margin-top: 8px; flex-wrap: wrap; gap: 6px; }
+        .corps-section { display: flex; align-items: flex-end; flex: 1; min-width: 100px; }
+        .numero-carte { font-size: 11px; font-weight: 700; background: #f0f4f8; padding: 4px 12px; border-radius: 30px; color: #2c5aa0; white-space: nowrap; border: 1px solid #e0e0e0; }
+        
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+        .stat-card { background: #fff; border-radius: 12px; padding: 12px 8px; text-align: center; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 22px; font-weight: 800; color: #2c5aa0; }
+        .stat-label { font-size: 9px; color: #666; margin-top: 2px; text-transform: uppercase; }
+        
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .action-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid #e0e0e0;
+        }
+        .action-card:active { transform: scale(0.96); background: #f8f9fa; }
+        .action-card:hover { border-color: #2c5aa0; box-shadow: 0 6px 16px rgba(44,90,160,0.15); }
+        .action-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 28px; color: white; }
+        .action-icon.blue { background: linear-gradient(135deg, #2c5aa0, #1e3a6f); }
+        .action-icon.green { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .action-icon i { color: #fff; }
+        .action-card h3 { color: #2c5aa0; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .action-card p { color: #666; font-size: 11px; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            max-width: 600px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-bottom: none;
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp { 0% { transform: translateY(40px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; border-radius: 20px 20px 0 0; }
+        .modal-header h2 { color: #2c5aa0; font-size: 16px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        .modal-header h2 i { color: #2c5aa0; }
+        .close-modal { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; padding: 0 4px; }
+        .modal-body { padding: 18px 20px; }
+        .modal-footer { padding: 12px 20px; border-top: 1px solid #e0e0e0; display: flex; gap: 10px; justify-content: flex-end; background: #f8f9fa; flex-wrap: wrap; }
+        
+        .ordonnance-item { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 10px; border: 1px solid #e0e0e0; border-left: 4px solid #2c5aa0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .ordonnance-item.pending { border-left-color: #ffc107; }
+        .ordonnance-item.refused { border-left-color: #dc3545; }
+        .ord-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+        .ord-id { font-weight: 700; color: #2c5aa0; font-size: 12px; }
+        .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-validated { background: #d4edda; color: #155724; }
+        .status-refused { background: #f8d7da; color: #721c24; }
+        .status-used { background: #e2e3e5; color: #383d41; }
+        .ord-info { font-size: 12px; color: #666; margin: 2px 0; }
+        .ord-actions { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+        
+        .unique-code { background: #e7f3ff; border: 1px dashed #2c5aa0; padding: 6px 10px; border-radius: 6px; font-family: 'Courier New', monospace; font-weight: 700; color: #2c5aa0; text-align: center; margin: 6px 0; font-size: 12px; word-break: break-all; }
+        
+        .products-progress { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #e0e0e0; }
+        .progress-bar { background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden; margin-top: 4px; }
+        .progress-fill { background: linear-gradient(90deg, #28a745, #20c997); height: 100%; transition: width 0.3s; }
+        .product-status { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #fff; border-radius: 6px; margin-bottom: 4px; font-size: 12px; border: 1px solid #e0e0e0; }
+        .product-status.delivered { border-color: #28a745; background: #d4edda; }
+        
+        .empty-state { text-align: center; padding: 30px 10px; color: #999; }
+        .empty-state i { font-size: 40px; margin-bottom: 10px; opacity: 0.4; display: block; }
+        
+        .notification {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 90%;
+            font-size: 13px;
+            pointer-events: none;
+        }
+        .notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+        .notification.info { background: #2c5aa0; }
+        .notification.warning { background: #fd7e14; }
+        
+        .modal-content::-webkit-scrollbar, .auth-body::-webkit-scrollbar { width: 4px; }
+        .modal-content::-webkit-scrollbar-track, .auth-body::-webkit-scrollbar-track { background: #f0f2f5; }
+        .modal-content::-webkit-scrollbar-thumb, .auth-body::-webkit-scrollbar-thumb { background: #2c5aa0; border-radius: 10px; }
+        
+        @media (max-width: 480px) {
+            .auth-box { border-radius: 16px; }
+            .auth-body { padding: 14px; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .stats-row .stat-card:last-child { grid-column: span 2; }
+            .actions-grid { grid-template-columns: 1fr; gap: 10px; }
+            .carte { padding: 16px; min-height: 320px; }
+            .ligne { font-size: 12px; }
+            .titre-carte { font-size: 14px; }
+            .top-bar-left h1 { font-size: 14px; }
+            .dashboard-content { padding: 12px; }
+            .action-card { padding: 16px 10px; }
+            .action-icon { width: 50px; height: 50px; font-size: 22px; }
+            .stat-value { font-size: 18px; }
+            .btn { font-size: 13px; padding: 10px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== AUTH ===== -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-box">
+                <div class="auth-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1>MiliSoin</h1>
+                    <p>Mutuelle Militaire du Niger</p>
+                </div>
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-tab="login"><i class="fas fa-sign-in-alt"></i> Connexion</div>
+                    <div class="auth-tab" data-tab="register"><i class="fas fa-user-plus"></i> Inscription</div>
+                </div>
+                <div class="auth-body">
+                    <form id="loginForm" class="auth-form active" autocomplete="on">
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" id="loginEmail" placeholder="votre@email.com" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label>Mot de passe <span class="required">*</span></label>
+                            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
+                        <div class="divider">ou</div>
+                        <button type="button" class="btn btn-google" id="googleLoginBtn">
+                            <i class="fab fa-google" style="color:#db4437;"></i> Google
+                        </button>
+                    </form>
+                    
+                    <form id="registerForm" class="auth-form" autocomplete="on">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nom <span class="required">*</span></label>
+                                <input type="text" id="regNom" placeholder="ABDOU" required autocomplete="family-name">
+                            </div>
+                            <div class="form-group">
+                                <label>Prénom <span class="required">*</span></label>
+                                <input type="text" id="regPrenom" placeholder="Issa" required autocomplete="given-name">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Grade <span class="required">*</span></label>
+                                <select id="regGrade" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option>Soldat 2ème classe</option>
+                                    <option>Soldat 1ère classe</option>
+                                    <option>Caporal</option>
+                                    <option>Caporal-chef</option>
+                                    <option>Sergent</option>
+                                    <option>Sergent-chef</option>
+                                    <option>Adjudant</option>
+                                    <option>Adjudant-chef</option>
+                                    <option>Aspirant</option>
+                                    <option>Sous-lieutenant</option>
+                                    <option>Lieutenant</option>
+                                    <option>Capitaine</option>
+                                    <option>Commandant</option>
+                                    <option>Lieutenant-colonel</option>
+                                    <option>Colonel</option>
+                                    <option>Général de brigade</option>
+                                    <option>Général de division</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Matricule <span class="required">*</span></label>
+                                <input type="text" id="regMatricule" placeholder="MIL-2025-001" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Date de naissance <span class="required">*</span></label>
+                            <input type="date" id="regDateNaissance" required min="1900-01-01" max="2010-12-31" value="2000-01-01">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Unité <span class="required">*</span></label>
+                                <select id="regUnite" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option>1er Bataillon</option>
+                                    <option>2ème Bataillon</option>
+                                    <option>3ème Bataillon</option>
+                                    <option>Bataillon du Génie</option>
+                                    <option>État-Major</option>
+                                    <option>Garde Républicaine</option>
+                                    <option>Gendarmerie Nationale</option>
+                                    <option>Police Nationale</option>
+                                    <option>Direction Générale</option>
+                                    <option>Service de Santé</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Corps <span class="required">*</span></label>
+                                <select id="regCorps" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option>Infanterie</option>
+                                    <option>Génie</option>
+                                    <option>Transmissions</option>
+                                    <option>Blindés</option>
+                                    <option>Artillerie</option>
+                                    <option>Logistique</option>
+                                    <option>Santé</option>
+                                    <option>Administration</option>
+                                    <option>Justice militaire</option>
+                                    <option>Police Nationale</option>
+                                    <option>Garde Nationale</option>
+                                    <option>Gendarmerie</option>
+                                    <option>Douanes</option>
+                                    <option>Eaux et Forêts</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Numéro de carte <span class="required">*</span></label>
+                            <input type="text" id="regNumeroCarte" placeholder="MSM-NI-2025-000001" required>
+                        </div>
+                        
+                        <div class="divider" style="margin: 12px 0;">Connexion</div>
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" id="regEmail" placeholder="votre@email.com" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label>Mot de passe <span class="required">*</span></label>
+                            <input type="password" id="regPassword" placeholder="Min 6 caractères" minlength="6" required autocomplete="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmer <span class="required">*</span></label>
+                            <input type="password" id="regPasswordConfirm" placeholder="Confirmez" minlength="6" required autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="registerBtn"><i class="fas fa-user-plus"></i> Créer mon compte</button>
+                        <div class="divider">ou</div>
+                        <button type="button" class="btn btn-google" id="googleRegisterBtn">
+                            <i class="fab fa-google" style="color:#db4437;"></i> Google
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="dashboardScreen" class="screen">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <i class="fas fa-shield-alt"></i>
+                <h1>MiliSoin</h1>
+                <span class="firebase-status">
+                    <span class="dot"></span>
+                    <span id="firebaseStatusText">Connecté</span>
+                </span>
+            </div>
+            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Quitter</button>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="carte-wrapper">
+                <div class="carte">
+                    <div class="fond-drapeau">
+                        <div class="bandes-obliques"></div>
+                        <div class="disque-soleil"></div>
+                    </div>
+                    <div class="contenu">
+                        <div class="en-tete">
+                            <h1>République du Niger</h1>
+                            <h2>Forces Armées Nigériennes</h2>
+                        </div>
+                        <div class="titre-carte">Carte Mutuelle de Santé Militaire</div>
+                        <div class="champs-container">
+                            <div class="ligne"><span class="label">Grade :</span><div class="pointilles" id="cardGrade">-</div></div>
+                            <div class="ligne"><span class="label">Nom :</span><div class="pointilles" id="cardNomPrenom">-</div></div>
+                            <div class="ligne"><span class="label">Matricule :</span><div class="pointilles" id="cardMatricule">-</div></div>
+                            <div class="ligne"><span class="label">Naissance :</span><div class="pointilles" id="cardDateNaissance">-</div></div>
+                            <div class="ligne"><span class="label">Unité :</span><div class="pointilles" id="cardUnite">-</div></div>
+                        </div>
+                        <div class="pied-carte">
+                            <div class="corps-section">
+                                <span class="label">Corps :</span>
+                                <div class="pointilles" id="cardCorps">-</div>
+                            </div>
+                            <div class="numero-carte" id="cardNumero">N° MSM-NI-2025-000000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-value" id="statPending">0</div><div class="stat-label">En attente</div></div>
+                <div class="stat-card"><div class="stat-value" id="statValidated">0</div><div class="stat-label">Validées</div></div>
+                <div class="stat-card"><div class="stat-value" id="statRefused">0</div><div class="stat-label">Refusées</div></div>
+                <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total</div></div>
+            </div>
+            
+            <div class="actions-grid">
+                <div class="action-card" onclick="openSendMessageModal()">
+                    <div class="action-icon blue"><i class="fas fa-paper-plane"></i></div>
+                    <h3>Envoyer</h3>
+                    <p>Demande de prise en charge</p>
+                </div>
+                <div class="action-card" onclick="openPriseEnChargeModal()">
+                    <div class="action-icon green"><i class="fas fa-file-medical-alt"></i></div>
+                    <h3>Prises en charge</h3>
+                    <p>Consulter &amp; PDF</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ENVOI ===== -->
+    <div id="sendMessageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-paper-plane"></i> Nouvelle demande</h2>
+                <button class="close-modal" onclick="closeModal('sendMessageModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="msgType">
+                        <option value="ordonnance">Ordonnance médicale</option>
+                        <option value="consultation">Consultation</option>
+                        <option value="remboursement">Remboursement</option>
+                        <option value="information">Information</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sujet <span class="required">*</span></label>
+                    <input type="text" id="msgSubject" placeholder="Sujet de votre demande">
+                </div>
+                <div class="form-group">
+                    <label>Message <span class="required">*</span></label>
+                    <textarea id="msgContent" rows="5" placeholder="Décrivez votre demande..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('sendMessageModal')">Annuler</button>
+                <button class="btn btn-primary" onclick="sendMessage()" style="width:auto;"><i class="fas fa-paper-plane"></i> Envoyer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL LISTE ===== -->
+    <div id="priseEnChargeModal" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-medical-alt"></i> Mes demandes</h2>
+                <button class="close-modal" onclick="closeModal('priseEnChargeModal')">&times;</button>
+            </div>
+            <div class="modal-body"><div id="ordonnancesList"></div></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('priseEnChargeModal')">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DÉTAIL ===== -->
+    <div id="ordonnanceDetailModal" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice"></i> Détail</h2>
+                <button class="close-modal" onclick="closeModal('ordonnanceDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="ordonnanceDetailContent"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('ordonnanceDetailModal')">Fermer</button>
+                <button class="btn btn-success" id="downloadPdfBtn" style="display:none;">
+                    <i class="fas fa-download"></i> Télécharger PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ==========================================================
+        // 🔥 FIREBASE
+        // ==========================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFMq3jwm78PDlS55VP4AcwTIDpH3ZINbI",
+            authDomain: "service-mutuel.firebaseapp.com",
+            projectId: "service-mutuel",
+            storageBucket: "service-mutuel.firebasestorage.app",
+            messagingSenderId: "172158976527",
+            appId: "1:172158976527:web:bf8ab64036dd695eafd97a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ==========================================================
+        // 🎨 VARIABLES
+        // ==========================================================
+        let currentUser = null;
+        let currentPatient = null;
+        let myOrdonnances = [];
+        let unsubscribeOrdonnances = null;
+
+        // ==========================================================
+        // 🎨 UTILITAIRES
+        // ==========================================================
+        function notify(message, type = 'info') {
+            const notif = document.getElementById('notification');
+            notif.className = `notification ${type} show`;
+            const icons = { success: 'check-circle', error: 'times-circle', info: 'info-circle', warning: 'exclamation-triangle' };
+            notif.innerHTML = `<i class="fas fa-${icons[type]}"></i> ${message}`;
+            clearTimeout(notif._timer);
+            notif._timer = setTimeout(() => notif.classList.remove('show'), 3200);
+        }
+
+        function formatDate(ts) {
+            if (!ts) return '-';
+            let d;
+            if (ts && ts.toDate) d = ts.toDate();
+            else if (typeof ts === 'number') d = new Date(ts);
+            else d = new Date(ts);
+            return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function formatDateShort(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('fr-FR').format(amount || 0) + ' FCFA';
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // ==========================================================
+        // ✅ GÉNÉRATEUR QR CODE (LOCAL)
+        // ==========================================================
+        function generateQRBase64(text, size = 140) {
+            try {
+                const typeNumber = 0;
+                const errorCorrectionLevel = 'M';
+                const qr = qrcode(typeNumber, errorCorrectionLevel);
+                qr.addData(text);
+                qr.make();
+                
+                const canvas = document.createElement('canvas');
+                const moduleCount = qr.getModuleCount();
+                const cellSize = Math.floor(size / moduleCount);
+                const actualSize = cellSize * moduleCount;
+                canvas.width = actualSize;
+                canvas.height = actualSize;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, actualSize, actualSize);
+                
+                ctx.fillStyle = '#000000';
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        if (qr.isDark(row, col)) {
+                            ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+                
+                return canvas.toDataURL('image/png');
+            } catch (e) {
+                console.error('Erreur génération QR:', e);
+                return null;
+            }
+        }
+
+        // ==========================================================
+        // 🔐 AUTH
+        // ==========================================================
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab === 'login' ? 'loginForm' : 'registerForm').classList.add('active');
+            });
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const btn = document.getElementById('loginBtn');
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                notify('Remplissez tous les champs', 'warning');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+            
+            try {
+                const cred = await auth.signInWithEmailAndPassword(email, password);
+                const patientDoc = await db.collection('patients').doc(cred.user.uid).get();
+                if (patientDoc.exists) {
+                    currentUser = cred.user;
+                    currentPatient = { id: patientDoc.id, ...patientDoc.data() };
+                    notify('✅ Connexion réussie !', 'success');
+                    loadDashboard();
+                    startOrdonnancesListener();
+                } else {
+                    notify('Profil introuvable', 'error');
+                    await auth.signOut();
+                }
+            } catch (error) {
+                console.error('Erreur login:', error);
+                let msg = 'Erreur de connexion';
+                if (error.code === 'auth/user-not-found') msg = 'Utilisateur non trouvé';
+                else if (error.code === 'auth/wrong-password') msg = 'Mot de passe incorrect';
+                else if (error.code === 'auth/invalid-email') msg = 'Email invalide';
+                else if (error.code === 'auth/too-many-requests') msg = 'Trop de tentatives';
+                else msg = error.message;
+                notify(msg, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const btn = document.getElementById('registerBtn');
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            
+            if (password !== passwordConfirm) {
+                notify('Mots de passe différents', 'error');
+                return;
+            }
+            
+            const numeroCarte = document.getElementById('regNumeroCarte').value.trim();
+            if (!numeroCarte) {
+                notify('Veuillez saisir un numéro de carte', 'warning');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
+            
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(
+                    document.getElementById('regEmail').value.trim(),
+                    password
+                );
+                
+                const patientData = {
+                    email: document.getElementById('regEmail').value.trim(),
+                    nom: document.getElementById('regNom').value.trim().toUpperCase(),
+                    prenom: document.getElementById('regPrenom').value.trim(),
+                    grade: document.getElementById('regGrade').value,
+                    matricule: document.getElementById('regMatricule').value.trim(),
+                    dateNaissance: document.getElementById('regDateNaissance').value,
+                    unite: document.getElementById('regUnite').value,
+                    corps: document.getElementById('regCorps').value,
+                    numeroCarte: numeroCarte,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('patients').doc(cred.user.uid).set(patientData);
+                currentUser = cred.user;
+                currentPatient = { id: cred.user.uid, ...patientData };
+                notify('✅ Inscription réussie !', 'success');
+                loadDashboard();
+                startOrdonnancesListener();
+            } catch (error) {
+                console.error('Erreur inscription:', error);
+                let msg = 'Erreur d\'inscription';
+                if (error.code === 'auth/email-already-in-use') msg = 'Email déjà utilisé';
+                else if (error.code === 'auth/weak-password') msg = 'Mot de passe trop faible';
+                else if (error.code === 'auth/invalid-email') msg = 'Email invalide';
+                else msg = error.message;
+                notify(msg, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-plus"></i> Créer mon compte';
+            }
+        });
+
+        async function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            try {
+                if (isMobile) {
+                    await auth.signInWithRedirect(provider);
+                } else {
+                    const result = await auth.signInWithPopup(provider);
+                    await handleGoogleAuth(result.user);
+                }
+            } catch (error) {
+                console.error('Erreur Google:', error);
+                notify('Erreur Google: ' + error.message, 'error');
+            }
+        }
+
+        auth.getRedirectResult().then(async (result) => {
+            if (result && result.user) {
+                await handleGoogleAuth(result.user);
+            }
+        }).catch((error) => {
+            console.error('Erreur redirect:', error);
+        });
+
+        async function handleGoogleAuth(user) {
+            const patientDoc = await db.collection('patients').doc(user.uid).get();
+            if (patientDoc.exists) {
+                currentUser = user;
+                currentPatient = { id: patientDoc.id, ...patientDoc.data() };
+                notify('✅ Connexion Google réussie !', 'success');
+                loadDashboard();
+                startOrdonnancesListener();
+            } else {
+                notify('Compte non enregistré', 'warning');
+                await auth.signOut();
+            }
+        }
+
+        document.getElementById('googleLoginBtn').addEventListener('click', signInWithGoogle);
+        document.getElementById('googleRegisterBtn').addEventListener('click', signInWithGoogle);
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            if (unsubscribeOrdonnances) unsubscribeOrdonnances();
+            try { await auth.signOut(); } catch(e) {}
+            currentUser = null;
+            currentPatient = null;
+            myOrdonnances = [];
+            showScreen('authScreen');
+        });
+
+        // ==========================================================
+        // 🏠 DASHBOARD
+        // ==========================================================
+        function loadDashboard() {
+            showScreen('dashboardScreen');
+            document.getElementById('cardGrade').textContent = currentPatient.grade || '-';
+            document.getElementById('cardNomPrenom').textContent = `${currentPatient.prenom || ''} ${currentPatient.nom || ''}`.trim() || '-';
+            document.getElementById('cardMatricule').textContent = currentPatient.matricule || '-';
+            document.getElementById('cardDateNaissance').textContent = currentPatient.dateNaissance ? formatDateShort(currentPatient.dateNaissance) : '-';
+            document.getElementById('cardUnite').textContent = currentPatient.unite || '-';
+            document.getElementById('cardCorps').textContent = currentPatient.corps || '-';
+            document.getElementById('cardNumero').textContent = `N° ${currentPatient.numeroCarte || 'MSM-NI-2025-000000'}`;
+        }
+
+        // ==========================================================
+        // 🔥 ÉCOUTE FIRESTORE
+        // ==========================================================
+        function startOrdonnancesListener() {
+            if (!currentPatient) return;
+            if (unsubscribeOrdonnances) unsubscribeOrdonnances();
+            
+            unsubscribeOrdonnances = db.collection('ordonnances')
+                .where('patientId', '==', currentPatient.id)
+                .onSnapshot((snapshot) => {
+                    myOrdonnances = [];
+                    snapshot.forEach(doc => myOrdonnances.push({ id: doc.id, ...doc.data() }));
+                    myOrdonnances.sort((a, b) => {
+                        const da = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt || 0);
+                        const db2 = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt || 0);
+                        return db2 - da;
+                    });
+                    updateStats();
+                    if (document.getElementById('priseEnChargeModal').classList.contains('active')) {
+                        loadOrdonnancesList();
+                    }
+                }, (error) => {
+                    console.error('Erreur listener:', error);
+                });
+        }
+
+        function updateStats() {
+            document.getElementById('statPending').textContent = myOrdonnances.filter(o => o.status === 'pending').length;
+            document.getElementById('statValidated').textContent = myOrdonnances.filter(o => o.status === 'validated' || o.status === 'used').length;
+            document.getElementById('statRefused').textContent = myOrdonnances.filter(o => o.status === 'refused').length;
+            document.getElementById('statTotal').textContent = myOrdonnances.length;
+        }
+
+        // ==========================================================
+        // 📤 ENVOI MESSAGE
+        // ==========================================================
+        function openSendMessageModal() {
+            document.getElementById('msgType').value = 'ordonnance';
+            document.getElementById('msgSubject').value = '';
+            document.getElementById('msgContent').value = '';
+            openModal('sendMessageModal');
+        }
+
+        async function sendMessage() {
+            const subject = document.getElementById('msgSubject').value.trim();
+            const content = document.getElementById('msgContent').value.trim();
+            if (!subject || !content) {
+                notify('Remplissez tous les champs', 'warning');
+                return;
+            }
+            const ordonnanceId = 'ORD' + Date.now();
+            try {
+                await db.collection('ordonnances').doc(ordonnanceId).set({
+                    id: ordonnanceId,
+                    patientId: currentPatient.id,
+                    patientEmail: currentPatient.email,
+                    patientName: `${currentPatient.prenom} ${currentPatient.nom}`,
+                    type: document.getElementById('msgType').value,
+                    subject,
+                    note: content,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    produits: [],
+                    imageDeleted: false
+                });
+                closeModal('sendMessageModal');
+                notify('✅ Demande envoyée !', 'success');
+            } catch (error) {
+                notify('Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // ==========================================================
+        // 📋 LISTE
+        // ==========================================================
+        function openPriseEnChargeModal() {
+            loadOrdonnancesList();
+            openModal('priseEnChargeModal');
+        }
+
+        function loadOrdonnancesList() {
+            const container = document.getElementById('ordonnancesList');
+            if (myOrdonnances.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i>Aucune demande</div>';
+                return;
+            }
+            const statusLabels = {
+                pending: { label: 'En attente', class: 'status-pending' },
+                validated: { label: 'Validée', class: 'status-validated' },
+                refused: { label: 'Refusée', class: 'status-refused' },
+                used: { label: 'Utilisée', class: 'status-used' }
+            };
+            container.innerHTML = myOrdonnances.map(o => {
+                const status = statusLabels[o.status] || statusLabels.pending;
+                let progressHtml = '';
+                if (o.produits && o.produits.length > 0 && (o.status === 'validated' || o.status === 'used')) {
+                    const delivered = o.produits.filter(p => p.delivered).length;
+                    const total = o.produits.length;
+                    const percent = Math.round((delivered / total) * 100);
+                    progressHtml = `
+                        <div class="products-progress">
+                            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:600; color:#666;">
+                                <span>Délivrés</span>
+                                <span>${delivered}/${total} (${percent}%)</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="ordonnance-item ${o.status}">
+                        <div class="ord-header">
+                            <span class="ord-id">${o.id}</span>
+                            <span class="status-badge ${status.class}">${status.label}</span>
+                        </div>
+                        ${o.uniqueCode ? `<div class="unique-code">🔐 ${o.uniqueCode}</div>` : ''}
+                        <div class="ord-info"><strong>Sujet:</strong> ${o.subject || '-'}</div>
+                        <div class="ord-info"><strong>Date:</strong> ${formatDate(o.createdAt)}</div>
+                        ${o.total ? `<div class="ord-info"><strong>Total:</strong> ${formatCurrency(o.total)}</div>` : ''}
+                        ${o.refusalReason ? `<div class="ord-info" style="color:#dc3545;"><strong>Motif:</strong> ${o.refusalReason}</div>` : ''}
+                        ${progressHtml}
+                        <div class="ord-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showOrdonnanceDetail('${o.id}')">
+                                <i class="fas fa-eye"></i> Détails
+                            </button>
+                            ${(o.status === 'validated' || o.status === 'used') ? `
+                                <button class="btn btn-success btn-sm" onclick="downloadOrdonnancePdf('${o.id}')">
+                                    <i class="fas fa-download"></i> PDF
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showOrdonnanceDetail(ordId) {
+            const ord = myOrdonnances.find(o => o.id === ordId);
+            if (!ord) return;
+            const statusLabels = {
+                pending: { label: 'En attente', class: 'status-pending' },
+                validated: { label: 'Validée', class: 'status-validated' },
+                refused: { label: 'Refusée', class: 'status-refused' },
+                used: { label: 'Utilisée', class: 'status-used' }
+            };
+            const status = statusLabels[ord.status] || statusLabels.pending;
+            
+            let content = `
+                <div style="background:#f8f9fa; padding:14px; border-radius:10px; margin-bottom:12px; border:1px solid #e0e0e0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                        <strong style="color:#2c5aa0;">${ord.id}</strong>
+                        <span class="status-badge ${status.class}">${status.label}</span>
+                    </div>
+                    ${ord.uniqueCode ? `<div class="unique-code">🔐 ${ord.uniqueCode}</div>` : ''}
+                    <div style="font-size:12px; color:#666; margin-top:4px;">
+                        <div><strong>Date:</strong> ${formatDate(ord.createdAt)}</div>
+                        <div><strong>Couverture:</strong> ${ord.coveragePercent || 80}%</div>
+                    </div>
+                </div>
+                <div style="background:#f8f9fa; padding:14px; border-radius:10px; margin-bottom:12px; border:1px solid #e0e0e0;">
+                    <h4 style="color:#2c5aa0; margin-bottom:8px; font-size:13px;"><i class="fas fa-comment"></i> Message</h4>
+                    <p style="font-size:13px; color:#333;">${ord.note || '-'}</p>
+                </div>
+            `;
+            
+            if (ord.produits && ord.produits.length > 0) {
+                content += `
+                    <div style="background:#f8f9fa; padding:14px; border-radius:10px; margin-bottom:12px; border:1px solid #e0e0e0;">
+                        <h4 style="color:#2c5aa0; margin-bottom:8px; font-size:13px;"><i class="fas fa-pills"></i> Médicaments</h4>
+                        ${ord.produits.map(p => `
+                            <div class="product-status ${p.delivered ? 'delivered' : 'pending'}">
+                                <i class="fas fa-${p.delivered ? 'check-circle' : 'clock'}" style="color:${p.delivered ? '#28a745' : '#ffc107'};"></i>
+                                <div style="flex:1;">
+                                    <strong>${p.name}</strong> - ${p.dosage}<br>
+                                    <small>Qté: ${p.qty}</small>
+                                </div>
+                                <span style="font-size:10px; font-weight:600;">${p.delivered ? '✅ Délivré' : '⏳ En attente'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="background:#e7f3ff; padding:14px; border-radius:10px; border-left:3px solid #2c5aa0;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:13px;"><span>Couverture mutuelle (${ord.coveragePercent || 80}%):</span><strong>${formatCurrency(ord.coverage)}</strong></div>
+                    </div>
+                `;
+            }
+            
+            if (ord.refusalReason) {
+                content += `<div style="background:#f8d7da; padding:14px; border-radius:10px; border-left:3px solid #dc3545; margin-top:12px;">
+                    <h4 style="color:#721c24; font-size:13px;"><i class="fas fa-times-circle"></i> Motif du refus</h4>
+                    <p style="font-size:13px;">${ord.refusalReason}</p>
+                </div>`;
+            }
+            
+            document.getElementById('ordonnanceDetailContent').innerHTML = content;
+            const downloadBtn = document.getElementById('downloadPdfBtn');
+            if (ord.status === 'validated' || ord.status === 'used') {
+                downloadBtn.style.display = 'inline-flex';
+                downloadBtn.onclick = () => downloadOrdonnancePdf(ordId);
+            } else {
+                downloadBtn.style.display = 'none';
+            }
+            openModal('ordonnanceDetailModal');
+        }
+
+        // ==========================================================
+        // 📄 TÉLÉCHARGEMENT PDF (SANS PRIX / RESTE À PAYER)
+        // ==========================================================
+        async function downloadOrdonnancePdf(ordId) {
+            const ord = myOrdonnances.find(o => o.id === ordId);
+            if (!ord) { notify('Ordonnance introuvable', 'error'); return; }
+            
+            notify('🔄 Génération PDF...', 'info');
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const patient = currentPatient;
+                
+                // Couleurs professionnelles (bleu/gris)
+                const primaryColor = [44, 90, 160];
+                const secondaryColor = [100, 150, 200];
+                const lightColor = [240, 245, 255];
+                
+                // ========== EN-TÊTE ==========
+                doc.setFillColor(...primaryColor);
+                doc.rect(0, 0, 210, 35, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(22);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MiliSoin - Mutuelle Militaire Niger', 105, 15, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Ordonnance Médicale Validée', 105, 25, { align: 'center' });
+                
+                doc.setDrawColor(255, 255, 255);
+                doc.setLineWidth(0.5);
+                doc.line(10, 32, 200, 32);
+                
+                // ========== INFORMATIONS GÉNÉRALES ==========
+                doc.setTextColor(60, 60, 60);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                let y = 42;
+                
+                if (ord.uniqueCode) {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`Code unique:`, 14, y);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(ord.uniqueCode, 50, y);
+                    y += 6;
+                }
+                doc.text(`ID Ordonnance: ${ord.id}`, 14, y);
+                y += 6;
+                doc.text(`Date: ${formatDate(ord.createdAt)}`, 14, y);
+                y += 6;
+                doc.text(`Couverture: ${ord.coveragePercent || 80}%`, 14, y);
+                y += 10;
+                
+                // ========== SECTION PATIENT ==========
+                doc.setFillColor(...secondaryColor);
+                doc.rect(14, y - 5, 182, 40, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(13);
+                doc.setFont('helvetica', 'bold');
+                doc.text('PATIENT', 18, y);
+                
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                
+                const patientY = y + 8;
+                doc.text(`Nom: ${patient.prenom} ${patient.nom}`, 18, patientY);
+                doc.text(`Matricule: ${patient.matricule}`, 110, patientY);
+                
+                doc.text(`Grade: ${patient.grade}`, 18, patientY + 6);
+                doc.text(`Unité: ${patient.unite}`, 110, patientY + 6);
+                
+                doc.text(`Corps: ${patient.corps}`, 18, patientY + 12);
+                doc.text(`N° Carte: ${patient.numeroCarte}`, 110, patientY + 12);
+                
+                doc.text(`Date naissance: ${formatDateShort(patient.dateNaissance)}`, 18, patientY + 18);
+                doc.text(`Email: ${patient.email}`, 110, patientY + 18);
+                
+                y += 48;
+                
+                // ========== SECTION MÉDICAMENTS ==========
+                doc.setTextColor(...primaryColor);
+                doc.setFontSize(13);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MÉDICAMENTS PRESCRITS', 14, y);
+                y += 8;
+                
+                if (ord.produits && ord.produits.length > 0) {
+                    doc.setFillColor(...primaryColor);
+                    doc.rect(14, y - 5, 182, 7, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'bold');
+                    
+                    doc.text('Médicament', 16, y);
+                    doc.text('Dosage', 90, y);
+                    doc.text('Quantité', 130, y);
+                    doc.text('Statut', 170, y);
+                    
+                    y += 5;
+                    
+                    doc.setFont('helvetica', 'normal');
+                    ord.produits.forEach((med, i) => {
+                        if (i % 2 === 0) {
+                            doc.setFillColor(...lightColor);
+                            doc.rect(14, y - 4, 182, 6, 'F');
+                        }
+                        
+                        doc.setTextColor(40, 40, 40);
+                        doc.setFontSize(9);
+                        
+                        const medName = med.name.length > 30 ? med.name.substring(0, 27) + '...' : med.name;
+                        doc.text(medName, 16, y);
+                        doc.text(med.dosage, 90, y);
+                        doc.text(med.qty.toString(), 130, y);
+                        
+                        doc.setTextColor(med.delivered ? 40 : 180, med.delivered ? 120 : 120, med.delivered ? 40 : 40);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(med.delivered ? '✓ Délivré' : '⏳ En attente', 170, y);
+                        
+                        y += 6;
+                    });
+                    
+                    y += 5;
+                } else {
+                    doc.setTextColor(100, 100, 100);
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'italic');
+                    doc.text('Aucun médicament prescrit', 14, y);
+                    y += 10;
+                }
+                
+                // ========== RÉSUMÉ FINANCIER (SEULEMENT COUVERTURE) ==========
+                y += 5;
+                doc.setDrawColor(...secondaryColor);
+                doc.setLineWidth(0.5);
+                doc.line(14, y, 196, y);
+                y += 8;
+                
+                doc.setTextColor(...primaryColor);
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text('RÉSUMÉ FINANCIER', 14, y);
+                y += 8;
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(60, 60, 60);
+                
+                doc.text(`Couverture mutuelle (${ord.coveragePercent || 80}%):`, 14, y);
+                doc.text(formatCurrency(ord.coverage), 140, y);
+                y += 10;
+                
+                // ========== QR CODE ==========
+                if (ord.qrData) {
+                    try {
+                        const qrDataToEncode = typeof ord.qrData === 'string' ? ord.qrData : JSON.stringify(ord.qrData);
+                        const qrBase64 = generateQRBase64(qrDataToEncode, 200);
+                        
+                        if (qrBase64) {
+                            doc.addImage(qrBase64, 'PNG', 145, y, 50, 50);
+                            
+                            doc.setFontSize(8);
+                            doc.setFont('helvetica', 'normal');
+                            doc.setTextColor(100, 100, 100);
+                            doc.text('QR Code sécurisé', 170, y + 55, { align: 'center' });
+                            doc.text('(À présenter en pharmacie)', 170, y + 60, { align: 'center' });
+                        }
+                    } catch (e) {
+                        console.error('Erreur QR:', e);
+                    }
+                }
+                
+                // ========== PIED DE PAGE ==========
+                doc.setFontSize(8);
+                doc.setTextColor(120, 120, 120);
+                doc.setFont('helvetica', 'italic');
+                
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    
+                    doc.setDrawColor(200, 200, 200);
+                    doc.setLineWidth(0.3);
+                    doc.line(14, 280, 196, 280);
+                    
+                    doc.text('MiliSoin - Mutuelle Militaire Niger', 105, 285, { align: 'center' });
+                    doc.text('Document sécurisé - Présentez-le en pharmacie avec votre carte mutuelle', 105, 290, { align: 'center' });
+                    doc.text(`Page ${i} sur ${pageCount}`, 105, 295, { align: 'center' });
+                }
+                
+                const fileName = `Ordonnance_${ord.id}_${patient.nom}_${patient.prenom}.pdf`;
+                doc.save(fileName);
+                notify('✅ PDF téléchargé avec succès !', 'success');
+                
+            } catch (error) {
+                console.error('Erreur PDF:', error);
+                notify('Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // ==========================================================
+        // 🚀 INIT
+        // ==========================================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const patientDoc = await db.collection('patients').doc(user.uid).get();
+                    if (patientDoc.exists) {
+                        currentUser = user;
+                        currentPatient = { id: patientDoc.id, ...patientDoc.data() };
+                        loadDashboard();
+                        startOrdonnancesListener();
+                    } else {
+                        showScreen('authScreen');
+                    }
+                } catch (error) {
+                    console.error('Erreur init:', error);
+                    showScreen('authScreen');
+                }
+            } else {
+                showScreen('authScreen');
+            }
+        });
+
+        console.log('🏥 MiliSoin Patient - Version complète');
+        console.log('✅ Thème bleu/gris (comme pharmacie)');
+        console.log('✅ QR Code généré localement');
+        console.log('✅ PDF sans prix ni reste à payer');
+        console.log('✅ Compatible Android');
+    </script>
+</body>
+</html>
