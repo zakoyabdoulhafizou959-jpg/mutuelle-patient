@@ -164,7 +164,6 @@
             gap: 8px;
         }
         
-        /* ✅ CARTE VIRTUELLE AVEC DRAPEAU NIGER INCLINÉ */
         .virtual-card {
             background: #ffffff;
             border-radius: 20px;
@@ -349,7 +348,6 @@
             color: var(--text-secondary);
         }
         
-        /* ✅ CARTE DES PHARMACIES AMÉLIORÉE */
         .map-container {
             height: 350px;
             border-radius: 16px;
@@ -421,7 +419,6 @@
             flex-shrink: 0;
         }
         
-        /* ✅ PANNEAU PHARMACIE SÉLECTIONNÉE AVEC BOUTONS */
         .pharmacy-selected-panel {
             background: var(--bg-card);
             border-radius: 16px;
@@ -485,7 +482,6 @@
             text-transform: uppercase;
         }
         
-        /* ✅ BOUTONS D'ACTION BIEN VISIBLES */
         .pharmacy-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -637,7 +633,6 @@
         .btn-danger { background: var(--danger); color: white; }
         .btn-secondary { background: var(--input-bg); color: var(--text-primary); }
         
-        /* ✅ UPLOAD IMAGE */
         .image-upload-zone {
             border: 3px dashed var(--primary);
             border-radius: 16px;
@@ -1133,40 +1128,20 @@
                         <label>Date de naissance</label>
                         <input type="date" id="regDateNaissance" required>
                     </div>
+                    <!-- ✅ MODIFICATION 1 : Unité = champ texte libre -->
                     <div class="form-group">
                         <label>Unité</label>
-                        <select id="regUnite" required>
-                            <option value="">-- Sélectionner --</option>
-                            <option>1er Bataillon</option>
-                            <option>2ème Bataillon</option>
-                            <option>3ème Bataillon</option>
-                            <option>Bataillon du Génie</option>
-                            <option>État-Major</option>
-                            <option>Garde Républicaine</option>
-                            <option>Gendarmerie Nationale</option>
-                            <option>Police Nationale</option>
-                            <option>Direction Générale</option>
-                            <option>Service de Santé</option>
-                        </select>
+                        <input type="text" id="regUnite" placeholder="Ex: 1er Bataillon, État-Major..." required>
                     </div>
+                    <!-- ✅ MODIFICATION 2 : Corps = select FAN/GNN/GN/PN -->
                     <div class="form-group">
                         <label>Corps</label>
                         <select id="regCorps" required>
                             <option value="">-- Sélectionner --</option>
-                            <option>Infanterie</option>
-                            <option>Génie</option>
-                            <option>Transmissions</option>
-                            <option>Blindés</option>
-                            <option>Artillerie</option>
-                            <option>Logistique</option>
-                            <option>Santé</option>
-                            <option>Administration</option>
-                            <option>Justice militaire</option>
-                            <option>Police Nationale</option>
-                            <option>Garde Nationale</option>
-                            <option>Gendarmerie</option>
-                            <option>Douanes</option>
-                            <option>Eaux et Forêts</option>
+                            <option value="FAN">FAN (Forces Armées Nigériennes)</option>
+                            <option value="GNN">GNN (Garde Nationale du Niger)</option>
+                            <option value="GN">GN (Gendarmerie Nationale)</option>
+                            <option value="PN">PN (Police Nationale)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1289,13 +1264,12 @@
                     </div>
                 </div>
 
-                <!-- ✅ PAGE CARTE AMÉLIORÉE -->
+                <!-- PAGE CARTE -->
                 <div class="page" id="page-map">
                     <div class="map-container">
                         <div id="map"></div>
                     </div>
 
-                    <!-- ✅ PANNEAU PHARMACIE SÉLECTIONNÉE -->
                     <div class="pharmacy-selected-panel" id="pharmacySelectedPanel">
                         <div class="selected-pharmacy-header">
                             <div class="pharmacy-icon">
@@ -1473,7 +1447,7 @@
         </div>
     </div>
 
-    <!-- Modal Envoi (juste image) -->
+    <!-- Modal Envoi -->
     <div class="modal" id="sendModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1556,7 +1530,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // ============ ✅ UPLOAD VIA VERCEL API ============
+        // ============ UPLOAD VIA VERCEL API ============
         const UPLOAD_API_URL = '/api/upload';
 
         async function uploadImageViaVercel(file, onProgress) {
@@ -1617,6 +1591,10 @@
         let pharmacyMarkers = [];
         let unsubscribeOrdonnances = null;
         let selectedImageFile = null;
+        
+        // ✅ AJOUT : Variables pour notifications arrière-plan
+        let bgCheckInterval = null;
+        let lastKnownStatuses = {};
 
         // ============ UTILITAIRES ============
         function parseDate(ts) {
@@ -1779,6 +1757,58 @@
             notify('🔔 Notification de test envoyée', 'success');
         }
 
+        // ✅ AJOUT : Système de notifications en arrière-plan (polling)
+        function startBackgroundChecks() {
+            document.addEventListener('visibilitychange', () => {
+                const settings = getNotifSettings();
+                if (!settings.background) return;
+                
+                if (document.hidden) {
+                    // App minimisée → polling toutes les 30s
+                    bgCheckInterval = setInterval(checkForUpdates, 30000);
+                } else {
+                    // App au premier plan → arrêter le polling
+                    if (bgCheckInterval) {
+                        clearInterval(bgCheckInterval);
+                        bgCheckInterval = null;
+                    }
+                }
+            });
+        }
+        
+        async function checkForUpdates() {
+            if (!currentPatient) return;
+            try {
+                const snapshot = await db.collection('ordonnances')
+                    .where('patientId', '==', currentPatient.id)
+                    .limit(10)
+                    .get();
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const prevStatus = lastKnownStatuses[data.id];
+                    
+                    if (prevStatus && prevStatus !== data.status && data.status !== 'pending') {
+                        let title = '', body = '';
+                        if (data.status === 'validated') {
+                            title = '✅ Ordonnance validée';
+                            body = `Votre demande ${data.id} a été validée.`;
+                        } else if (data.status === 'refused') {
+                            title = '❌ Ordonnance refusée';
+                            body = `Motif: ${data.refusalReason || 'Non spécifié'}`;
+                        } else if (data.status === 'used') {
+                            title = '📦 Ordonnance utilisée';
+                            body = `Votre demande ${data.id} a été utilisée.`;
+                        }
+                        if (title) showNativeNotification(title, body);
+                    }
+                    lastKnownStatuses[data.id] = data.status;
+                });
+            } catch (e) {
+                console.error('BG check:', e);
+            }
+        }
+
         // ============ THEME ============
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
@@ -1889,6 +1919,7 @@
             getUserLocation();
             requestNotificationPermission();
             loadNotifSettings();
+            startBackgroundChecks(); // ✅ AJOUT : démarrer le polling arrière-plan
         }
 
         function loadDashboard() {
@@ -1906,6 +1937,7 @@
 
         async function logout() {
             if (unsubscribeOrdonnances) unsubscribeOrdonnances();
+            if (bgCheckInterval) clearInterval(bgCheckInterval); // ✅ AJOUT
             try { await auth.signOut(); } catch(e) {}
             currentUser = null;
             currentPatient = null;
@@ -2054,6 +2086,9 @@
                     });
                     updateStats();
                     detectChanges(previousOrds, myOrdonnances);
+                    
+                    // ✅ AJOUT : Mettre à jour les statuts connus pour le polling
+                    myOrdonnances.forEach(o => lastKnownStatuses[o.id] = o.status);
                 });
         }
 
@@ -2200,7 +2235,7 @@
             openModal('detailModal');
         }
 
-        // ============ PDF ============
+        // ============ PDF AVEC QR CODE ============
         async function downloadPDF(ordId) {
             const ord = myOrdonnances.find(o => o.id === ordId);
             if (!ord) return;
@@ -2281,6 +2316,41 @@
                     y += 8;
                 }
                 
+                // ✅ AJOUT : QR CODE via api.qrserver.com
+                if (ord.qrData) {
+                    try {
+                        const qrStr = typeof ord.qrData === 'string' ? ord.qrData : JSON.stringify(ord.qrData);
+                        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrStr)}&margin=10`;
+                        
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        
+                        await new Promise((resolve) => {
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = 200;
+                                canvas.height = 200;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, 200, 200);
+                                const dataUrl = canvas.toDataURL('image/png');
+                                doc.addImage(dataUrl, 'PNG', 150, y + 5, 45, 45);
+                                
+                                doc.setFontSize(8);
+                                doc.setFont('helvetica', 'normal');
+                                doc.setTextColor(100, 100, 100);
+                                doc.text('QR Code sécurisé', 172, y + 55, { align: 'center' });
+                                doc.text('(Scannez en pharmacie)', 172, y + 60, { align: 'center' });
+                                resolve();
+                            };
+                            img.onerror = () => resolve();
+                            img.src = qrUrl;
+                            setTimeout(resolve, 5000);
+                        });
+                    } catch (e) {
+                        console.error('Erreur QR:', e);
+                    }
+                }
+                
                 doc.setDrawColor(100, 150, 200);
                 doc.line(14, y, 196, y);
                 y += 8;
@@ -2306,7 +2376,7 @@
             }
         }
 
-        // ============ ✅ CARTE DES PHARMACIES AMÉLIORÉE ============
+        // ============ CARTE DES PHARMACIES ============
         async function loadPharmacies() {
             try {
                 const snapshot = await db.collection('pharmacies').get();
@@ -2326,7 +2396,6 @@
                     }
                 });
                 
-                // Pharmacies de démo si aucune dans la BDD
                 if (allPharmacies.length === 0) {
                     allPharmacies = [
                         { id: 'demo1', nom: 'Pharmacie Centrale', telephone: '+227 20 73 45 67', adresse: 'Avenue de la République, Niamey', lat: 13.5127, lng: 2.1128 },
@@ -2474,33 +2543,27 @@
             });
         }
 
-        // ✅ SÉLECTION D'UNE PHARMACIE - AFFICHE LES BOUTONS
         async function selectPharmacy(lat, lng, name, phone, address) {
             selectedPharmacy = { lat, lng, name, phone, address };
             
-            // Mettre en surbrillance dans la liste
             document.querySelectorAll('.pharmacy-item').forEach(item => {
                 item.classList.remove('selected');
             });
             const selectedItem = document.querySelector(`.pharmacy-item[onclick*="${name.replace(/'/g, "\\'")}"]`);
             if (selectedItem) selectedItem.classList.add('selected');
             
-            // Centrer la carte sur la pharmacie
             if (map) {
                 map.setView([lat, lng], 16);
             }
             
-            // ✅ Mettre à jour le panneau d'information
             document.getElementById('selectedPharmacyName').textContent = name;
             document.getElementById('selectedPharmacyAddress').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${address || 'Adresse non disponible'}`;
             document.getElementById('selectedPharmacyPhone').innerHTML = phone ? `<i class="fas fa-phone"></i> ${phone}` : '<i class="fas fa-phone"></i> Non disponible';
             
-            // Calculer distance
             if (userLocation) {
                 const distance = getDistance(userLocation.lat, userLocation.lng, lat, lng);
                 document.getElementById('routeDistance').textContent = distance < 1 ? (distance * 1000).toFixed(0) + ' m' : distance.toFixed(1) + ' km';
                 
-                // Estimation durée (vitesse moyenne 30 km/h en ville)
                 const duration = Math.max(1, Math.round((distance / 30) * 60));
                 document.getElementById('routeDuration').textContent = duration + ' min';
             } else {
@@ -2508,10 +2571,8 @@
                 document.getElementById('routeDuration').textContent = '-';
             }
             
-            // ✅ Afficher le panneau
             document.getElementById('pharmacySelectedPanel').classList.add('active');
             
-            // Calculer l'itinéraire réel via OSRM
             if (userLocation) {
                 try {
                     const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${userLocation.lng},${userLocation.lat};${lng},${lat}?overview=full&geometries=geojson`);
@@ -2522,12 +2583,10 @@
                         const distance = (route.distance / 1000).toFixed(1);
                         const duration = Math.round(route.duration / 60);
                         
-                        // Supprimer l'ancien itinéraire
                         if (routeLayer) {
                             map.removeLayer(routeLayer);
                         }
                         
-                        // Dessiner le nouvel itinéraire
                         routeLayer = L.geoJSON(route.geometry, {
                             style: { color: '#2c5aa0', weight: 5, opacity: 0.8 }
                         }).addTo(map);
@@ -2543,7 +2602,6 @@
             }
         }
 
-        // ✅ OUVRIR L'ITINÉRAIRE DANS GOOGLE MAPS
         function openNavigation() {
             if (!selectedPharmacy) {
                 notify('⚠️ Veuillez sélectionner une pharmacie', 'warning');
@@ -2559,7 +2617,6 @@
             window.open(url, '_blank');
         }
 
-        // ✅ APPELER LA PHARMACIE
         function callPharmacy() {
             if (!selectedPharmacy) {
                 notify('⚠️ Veuillez sélectionner une pharmacie', 'warning');
@@ -2571,7 +2628,6 @@
                 return;
             }
             
-            // Sur mobile, ouvre l'app téléphone
             window.location.href = `tel:${selectedPharmacy.phone}`;
         }
 
