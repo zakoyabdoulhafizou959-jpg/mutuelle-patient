@@ -9,22 +9,14 @@
     <meta name="mobile-web-app-capable" content="yes">
     <title>MiliSoin</title>
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Leaflet (Carte) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- jsPDF -->
     <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     
     <style>
-        /* ===== RESET & BASE ===== */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0; padding: 0; box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -34,8 +26,7 @@
         html, body {
             overflow: hidden;
             position: fixed;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
@@ -45,7 +36,6 @@
             transition: background 0.3s, color 0.3s;
         }
         
-        /* ===== THEMES ===== */
         :root {
             --primary: #2c5aa0;
             --primary-light: #3d6ab5;
@@ -79,16 +69,8 @@
             --input-bg: #21262d;
         }
         
-        /* ===== APP CONTAINER ===== */
-        .app {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        .app { width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* ===== HEADER ===== */
         .app-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
@@ -101,26 +83,16 @@
             z-index: 100;
         }
         
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
+        .header-left { display: flex; align-items: center; gap: 10px; }
         .header-left i { font-size: 22px; }
         .header-left h1 { font-size: 18px; font-weight: 700; }
-        
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .header-actions { display: flex; gap: 8px; }
         
         .icon-btn {
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -129,7 +101,6 @@
             cursor: pointer;
         }
         
-        /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
             overflow-y: auto;
@@ -138,12 +109,7 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        .page {
-            display: none;
-            padding: 16px;
-            animation: fadeIn 0.3s;
-        }
-        
+        .page { display: none; padding: 16px; animation: fadeIn 0.3s; }
         .page.active { display: block; }
         
         @keyframes fadeIn {
@@ -151,12 +117,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* ===== BOTTOM NAVIGATION ===== */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             background: var(--nav-bg);
             border-top: 1px solid var(--border-color);
             display: flex;
@@ -183,7 +146,6 @@
         .nav-item i { font-size: 20px; }
         .nav-item span { font-size: 10px; font-weight: 600; }
         
-        /* ===== CARDS ===== */
         .card {
             background: var(--bg-card);
             border-radius: 16px;
@@ -202,7 +164,7 @@
             gap: 8px;
         }
         
-        /* ===== ✅ CARTE VIRTUELLE AVEC DRAPEAU NIGER INCLINÉ ===== */
+        /* ✅ CARTE VIRTUELLE AVEC DRAPEAU NIGER INCLINÉ */
         .virtual-card {
             background: #ffffff;
             border-radius: 20px;
@@ -215,14 +177,11 @@
             border: 1px solid #e0e0e0;
         }
         
-        /* Drapeau Niger incliné en arrière-plan */
         .virtual-card::before {
             content: '';
             position: absolute;
-            top: -30%;
-            left: -10%;
-            width: 120%;
-            height: 160%;
+            top: -30%; left: -10%;
+            width: 120%; height: 160%;
             background: linear-gradient(
                 135deg,
                 transparent 41%,
@@ -237,14 +196,11 @@
             z-index: 0;
         }
         
-        /* Disque solaire du drapeau */
         .virtual-card::after {
             content: '';
             position: absolute;
-            top: 49%;
-            left: 48.5%;
-            width: 38px;
-            height: 38px;
+            top: 49%; left: 48.5%;
+            width: 38px; height: 38px;
             background: rgba(224, 82, 6, 0.35);
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -267,10 +223,7 @@
             color: #000;
         }
         
-        .card-header-info p {
-            font-size: 11px;
-            color: #000;
-        }
+        .card-header-info p { font-size: 11px; color: #000; }
         
         .card-fields {
             position: relative;
@@ -326,7 +279,6 @@
             border: 1px solid #e0e0e0;
         }
         
-        /* ===== STATS GRID ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -342,12 +294,7 @@
             box-shadow: var(--shadow);
         }
         
-        .stat-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-        
+        .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); }
         .stat-label {
             font-size: 11px;
             color: var(--text-secondary);
@@ -355,7 +302,6 @@
             text-transform: uppercase;
         }
         
-        /* ===== ACTION BUTTONS ===== */
         .action-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -376,8 +322,7 @@
         .action-btn:active { transform: scale(0.95); }
         
         .action-icon {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -404,24 +349,19 @@
             color: var(--text-secondary);
         }
         
-        /* ===== MAP PAGE ===== */
+        /* ✅ CARTE DES PHARMACIES AMÉLIORÉE */
         .map-container {
-            height: calc(100vh - 200px);
+            height: 350px;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: var(--shadow);
             margin-bottom: 12px;
+            border: 2px solid var(--primary);
         }
         
-        #map {
-            width: 100%;
-            height: 100%;
-        }
+        #map { width: 100%; height: 100%; }
         
-        .pharmacy-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
+        .pharmacy-list { max-height: 300px; overflow-y: auto; }
         
         .pharmacy-item {
             background: var(--bg-card);
@@ -433,13 +373,15 @@
             align-items: center;
             gap: 12px;
             cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
         }
         
         .pharmacy-item:active { transform: scale(0.98); }
+        .pharmacy-item.selected { border-color: var(--primary); background: rgba(44,90,160,0.05); }
         
         .pharmacy-icon {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             border-radius: 50%;
             background: linear-gradient(135deg, #28a745, #1e7e34);
             color: white;
@@ -470,10 +412,7 @@
             gap: 2px;
         }
         
-        .pharmacy-details i {
-            width: 14px;
-            color: var(--primary);
-        }
+        .pharmacy-details i { width: 14px; color: var(--primary); }
         
         .pharmacy-distance {
             font-size: 12px;
@@ -482,70 +421,108 @@
             flex-shrink: 0;
         }
         
-        /* ===== ROUTE INFO ===== */
-        .route-info {
+        /* ✅ PANNEAU PHARMACIE SÉLECTIONNÉE AVEC BOUTONS */
+        .pharmacy-selected-panel {
             background: var(--bg-card);
-            border-radius: 12px;
-            padding: 12px;
+            border-radius: 16px;
+            padding: 16px;
             margin-bottom: 12px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--primary);
             display: none;
         }
         
-        .route-info.active { display: block; }
+        .pharmacy-selected-panel.active { display: block; }
+        
+        .selected-pharmacy-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .selected-pharmacy-header .pharmacy-icon {
+            width: 50px; height: 50px;
+            font-size: 22px;
+        }
+        
+        .selected-pharmacy-info { flex: 1; }
+        
+        .selected-pharmacy-info h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .selected-pharmacy-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 2px 0;
+        }
+        
+        .selected-pharmacy-info p i {
+            width: 16px;
+            color: var(--primary);
+        }
         
         .route-stats {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: var(--input-bg);
+            border-radius: 10px;
         }
         
-        .route-stat {
-            text-align: center;
-        }
-        
-        .route-stat-value {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-        
+        .route-stat { text-align: center; }
+        .route-stat-value { font-size: 20px; font-weight: 800; color: var(--primary); }
         .route-stat-label {
             font-size: 10px;
             color: var(--text-secondary);
             text-transform: uppercase;
         }
         
-        .route-actions {
-            display: flex;
-            gap: 8px;
+        /* ✅ BOUTONS D'ACTION BIEN VISIBLES */
+        .pharmacy-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
         
-        .route-btn {
-            flex: 1;
-            padding: 10px;
+        .pharmacy-action-btn {
+            padding: 14px 12px;
             border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
+            transition: all 0.2s;
+            text-transform: uppercase;
         }
         
-        .route-btn.primary {
-            background: var(--primary);
+        .pharmacy-action-btn:active { transform: scale(0.95); }
+        
+        .pharmacy-action-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
+            box-shadow: 0 4px 12px rgba(44,90,160,0.3);
         }
         
-        .route-btn.secondary {
-            background: var(--input-bg);
-            color: var(--text-primary);
+        .pharmacy-action-btn.success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
         }
         
-        /* ===== ORDONNANCE ITEM ===== */
+        .pharmacy-action-btn i { font-size: 16px; }
+        
         .ord-item {
             background: var(--bg-card);
             border-radius: 12px;
@@ -566,11 +543,7 @@
             margin-bottom: 8px;
         }
         
-        .ord-id {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary);
-        }
+        .ord-id { font-size: 12px; font-weight: 700; color: var(--primary); }
         
         .status-badge {
             padding: 3px 10px;
@@ -589,17 +562,8 @@
         [data-theme="dark"] .status-validated { background: #1a3a1a; color: #28a745; }
         [data-theme="dark"] .status-refused { background: #3a1a1a; color: #dc3545; }
         
-        .ord-info {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin: 3px 0;
-        }
-        
-        .ord-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
+        .ord-info { font-size: 12px; color: var(--text-secondary); margin: 3px 0; }
+        .ord-actions { display: flex; gap: 8px; margin-top: 10px; }
         
         .ord-btn {
             flex: 1;
@@ -618,10 +582,7 @@
         .ord-btn.primary { background: var(--primary); color: white; }
         .ord-btn.success { background: var(--success); color: white; }
         
-        /* ===== FORMS ===== */
-        .form-group {
-            margin-bottom: 14px;
-        }
+        .form-group { margin-bottom: 14px; }
         
         .form-group label {
             display: block;
@@ -676,7 +637,7 @@
         .btn-danger { background: var(--danger); color: white; }
         .btn-secondary { background: var(--input-bg); color: var(--text-primary); }
         
-        /* ===== ✅ UPLOAD IMAGE ===== */
+        /* ✅ UPLOAD IMAGE */
         .image-upload-zone {
             border: 3px dashed var(--primary);
             border-radius: 16px;
@@ -737,14 +698,12 @@
         
         .remove-image-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 10px; right: 10px;
             background: rgba(220, 53, 69, 0.95);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             cursor: pointer;
             font-size: 16px;
             display: flex;
@@ -805,13 +764,8 @@
         }
         
         .image-zoom.active { display: flex; }
-        .image-zoom img {
-            max-width: 95%;
-            max-height: 95%;
-            border-radius: 8px;
-        }
+        .image-zoom img { max-width: 95%; max-height: 95%; border-radius: 8px; }
         
-        /* ===== THEME SWITCHER ===== */
         .theme-option {
             display: flex;
             align-items: center;
@@ -824,9 +778,7 @@
             cursor: pointer;
         }
         
-        .theme-option.active {
-            border: 2px solid var(--primary);
-        }
+        .theme-option.active { border: 2px solid var(--primary); }
         
         .theme-option-left {
             display: flex;
@@ -835,8 +787,7 @@
         }
         
         .theme-icon {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -853,12 +804,8 @@
             color: var(--text-primary);
         }
         
-        .theme-check {
-            color: var(--primary);
-            font-size: 18px;
-        }
+        .theme-check { color: var(--primary); font-size: 18px; }
         
-        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -912,8 +859,7 @@
             font-size: 24px;
             color: var(--text-secondary);
             cursor: pointer;
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -932,7 +878,6 @@
             background: var(--bg-card);
         }
         
-        /* ===== NOTIFICATION ===== */
         .notification {
             position: fixed;
             top: 70px;
@@ -958,7 +903,6 @@
         .notification.info { background: var(--primary); }
         .notification.warning { background: var(--warning); color: #000; }
         
-        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -971,7 +915,6 @@
             opacity: 0.3;
         }
         
-        /* ===== AUTH PAGE ===== */
         .auth-container {
             min-height: 100vh;
             display: flex;
@@ -991,11 +934,7 @@
         .auth-header h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
         .auth-header p { font-size: 13px; opacity: 0.9; }
         
-        .auth-body {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
+        .auth-body { flex: 1; padding: 20px; overflow-y: auto; }
         
         .auth-tabs {
             display: flex;
@@ -1026,7 +965,6 @@
         .auth-form { display: none; }
         .auth-form.active { display: block; }
         
-        /* ===== PROFILE MENU ===== */
         .profile-header {
             text-align: center;
             padding: 20px;
@@ -1037,8 +975,7 @@
         }
         
         .profile-avatar {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
@@ -1077,8 +1014,7 @@
         .menu-item:active { transform: scale(0.98); }
         
         .menu-icon {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -1109,7 +1045,6 @@
             font-size: 14px;
         }
         
-        /* ===== LOADING ===== */
         .loading {
             display: flex;
             justify-content: center;
@@ -1117,8 +1052,7 @@
         }
         
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border: 4px solid var(--border-color);
             border-top-color: var(--primary);
             border-radius: 50%;
@@ -1260,7 +1194,6 @@
 
         <!-- MAIN APP -->
         <div id="mainApp" style="display:none;" class="app">
-            <!-- Header -->
             <div class="app-header">
                 <div class="header-left">
                     <i class="fas fa-shield-alt"></i>
@@ -1273,7 +1206,6 @@
                 </div>
             </div>
 
-            <!-- Main Content -->
             <div class="main-content">
                 <!-- PAGE ACCUEIL -->
                 <div class="page active" id="page-home">
@@ -1357,9 +1289,25 @@
                     </div>
                 </div>
 
-                <!-- PAGE CARTE -->
+                <!-- ✅ PAGE CARTE AMÉLIORÉE -->
                 <div class="page" id="page-map">
-                    <div class="route-info" id="routeInfo">
+                    <div class="map-container">
+                        <div id="map"></div>
+                    </div>
+
+                    <!-- ✅ PANNEAU PHARMACIE SÉLECTIONNÉE -->
+                    <div class="pharmacy-selected-panel" id="pharmacySelectedPanel">
+                        <div class="selected-pharmacy-header">
+                            <div class="pharmacy-icon">
+                                <i class="fas fa-prescription-bottle-alt"></i>
+                            </div>
+                            <div class="selected-pharmacy-info">
+                                <h3 id="selectedPharmacyName">-</h3>
+                                <p id="selectedPharmacyAddress"><i class="fas fa-map-marker-alt"></i> -</p>
+                                <p id="selectedPharmacyPhone"><i class="fas fa-phone"></i> -</p>
+                            </div>
+                        </div>
+                        
                         <div class="route-stats">
                             <div class="route-stat">
                                 <div class="route-stat-value" id="routeDistance">-</div>
@@ -1370,18 +1318,15 @@
                                 <div class="route-stat-label">Durée</div>
                             </div>
                         </div>
-                        <div class="route-actions">
-                            <button class="route-btn primary" onclick="openNavigation()">
+                        
+                        <div class="pharmacy-actions">
+                            <button class="pharmacy-action-btn primary" onclick="openNavigation()">
                                 <i class="fas fa-directions"></i> Itinéraire
                             </button>
-                            <button class="route-btn secondary" onclick="callPharmacy()">
+                            <button class="pharmacy-action-btn success" onclick="callPharmacy()">
                                 <i class="fas fa-phone"></i> Appeler
                             </button>
                         </div>
-                    </div>
-
-                    <div class="map-container">
-                        <div id="map"></div>
                     </div>
 
                     <div class="card">
@@ -1442,7 +1387,6 @@
                         </div>
                     </div>
 
-                    <!-- ✅ AJOUT : Notifications -->
                     <div class="card">
                         <div class="card-title">
                             <i class="fas fa-bell"></i> Notifications
@@ -1508,7 +1452,6 @@
                 </div>
             </div>
 
-            <!-- Bottom Navigation -->
             <div class="bottom-nav">
                 <div class="nav-item active" onclick="switchPage('home')">
                     <i class="fas fa-home"></i>
@@ -1530,7 +1473,7 @@
         </div>
     </div>
 
-    <!-- ✅ Modal Envoi MODIFIÉ (juste image) -->
+    <!-- Modal Envoi (juste image) -->
     <div class="modal" id="sendModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1589,14 +1532,12 @@
         </div>
     </div>
 
-    <!-- ✅ Zoom Image -->
     <div class="image-zoom" id="imageZoom" onclick="this.classList.remove('active')">
         <img id="zoomImage" src="" alt="Zoom">
     </div>
 
     <div class="notification" id="notification"></div>
 
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
@@ -1615,15 +1556,53 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // ============ ✅ BACKBLAZE B2 ============
-        const B2_CONFIG = {
-            keyId: '786f70c49f56',
-            applicationKey: '0058a69c72c63bc942bcac0b73dbbfa071419c5e14',
-            bucketName: 'mutuelle',
-            publicUrl: 'https://f005.backblazeb2.com/file/mutuelle'
-        };
-        let b2AuthToken = null;
-        let b2ApiUrl = null;
+        // ============ ✅ UPLOAD VIA VERCEL API ============
+        const UPLOAD_API_URL = '/api/upload';
+
+        async function uploadImageViaVercel(file, onProgress) {
+            try {
+                if (onProgress) onProgress(10);
+                
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                
+                if (onProgress) onProgress(30);
+                
+                const timestamp = Date.now();
+                const fileName = `ordonnances/patient_${currentPatient.id}_${timestamp}_${file.name}`;
+                
+                const response = await fetch(UPLOAD_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        file: base64,
+                        fileName: fileName,
+                        mimeType: file.type || 'image/jpeg'
+                    })
+                });
+                
+                if (onProgress) onProgress(80);
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Upload échoué');
+                }
+                
+                const result = await response.json();
+                
+                if (onProgress) onProgress(100);
+                
+                return result.url;
+                
+            } catch (error) {
+                console.error('Erreur upload:', error);
+                throw error;
+            }
+        }
 
         // ============ VARIABLES ============
         let currentUser = null;
@@ -1638,7 +1617,6 @@
         let pharmacyMarkers = [];
         let unsubscribeOrdonnances = null;
         let selectedImageFile = null;
-        let selectedImageBase64 = null;
 
         // ============ UTILITAIRES ============
         function parseDate(ts) {
@@ -1676,14 +1654,18 @@
             const pageIndex = { home: 0, map: 1, orders: 2, profile: 3 }[page];
             if (navItems[pageIndex]) navItems[pageIndex].classList.add('active');
             
-            if (page === 'map') initMap();
+            if (page === 'map') {
+                setTimeout(() => {
+                    initMap();
+                }, 100);
+            }
             if (page === 'orders') loadOrders();
         }
 
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // ============ ✅ NOTIFICATIONS SON/VIBRATION ============
+        // ============ NOTIFICATIONS ============
         function getNotifSettings() {
             const saved = localStorage.getItem('milisoin_notif_settings');
             if (saved) return JSON.parse(saved);
@@ -1694,7 +1676,6 @@
             localStorage.setItem('milisoin_notif_settings', JSON.stringify(settings));
         }
 
-        // Charger les paramètres au démarrage
         function loadNotifSettings() {
             const settings = getNotifSettings();
             const soundEl = document.getElementById('notifSound');
@@ -1704,7 +1685,6 @@
             if (vibEl) vibEl.checked = settings.vibration;
             if (bgEl) bgEl.checked = settings.background;
             
-            // Sauvegarder quand on change
             [soundEl, vibEl, bgEl].forEach(el => {
                 if (el) el.addEventListener('change', () => {
                     saveNotifSettings({
@@ -1934,83 +1914,7 @@
             document.getElementById('mainApp').style.display = 'none';
         }
 
-        // ============ ✅ BACKBLAZE B2 UPLOAD ============
-        async function authenticateB2() {
-            try {
-                const credentials = btoa(`${B2_CONFIG.keyId}:${B2_CONFIG.applicationKey}`);
-                const response = await fetch('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', {
-                    headers: { 'Authorization': `Basic ${credentials}` }
-                });
-                const data = await response.json();
-                b2AuthToken = data.authorizationToken;
-                b2ApiUrl = data.apiUrl;
-                return true;
-            } catch (error) {
-                console.error('Erreur auth B2:', error);
-                return false;
-            }
-        }
-
-        async function getBucketId() {
-            if (!b2AuthToken) await authenticateB2();
-            const response = await fetch(`${b2ApiUrl}/b2api/v2/b2_list_buckets`, {
-                method: 'POST',
-                headers: { 'Authorization': b2AuthToken, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ accountId: B2_CONFIG.keyId.split('_')[0] })
-            });
-            const data = await response.json();
-            const bucket = data.buckets.find(b => b.bucketName === B2_CONFIG.bucketName);
-            return bucket.bucketId;
-        }
-
-        async function uploadToB2(file, fileName, onProgress) {
-            if (!b2AuthToken) {
-                const authOk = await authenticateB2();
-                if (!authOk) throw new Error('Authentification B2 échouée');
-            }
-            
-            const bucketId = await getBucketId();
-            
-            const getUrlResponse = await fetch(`${b2ApiUrl}/b2api/v2/b2_get_upload_url`, {
-                method: 'POST',
-                headers: { 'Authorization': b2AuthToken, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bucketId })
-            });
-            const uploadData = await getUrlResponse.json();
-            
-            return new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                
-                xhr.upload.addEventListener('progress', (e) => {
-                    if (e.lengthComputable && onProgress) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        onProgress(percent);
-                    }
-                });
-                
-                xhr.addEventListener('load', () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        const result = JSON.parse(xhr.responseText);
-                        resolve(`${B2_CONFIG.publicUrl}/${encodeURIComponent(fileName)}`);
-                    } else {
-                        reject(new Error('Upload échoué: ' + xhr.statusText));
-                    }
-                });
-                
-                xhr.addEventListener('error', () => reject(new Error('Erreur réseau')));
-                xhr.addEventListener('abort', () => reject(new Error('Upload annulé')));
-                
-                xhr.open('POST', uploadData.uploadUrl);
-                xhr.setRequestHeader('Authorization', uploadData.authorizationToken);
-                xhr.setRequestHeader('X-Bz-File-Name', encodeURIComponent(fileName));
-                xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-                xhr.setRequestHeader('X-Bz-Content-Sha1', 'do_not_verify');
-                
-                xhr.send(file);
-            });
-        }
-
-        // ============ ✅ IMAGE UPLOAD ============
+        // ============ IMAGE UPLOAD ============
         const imageInput = document.getElementById('ordonnanceImageInput');
         const imageUploadZone = document.getElementById('imageUploadZone');
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
@@ -2056,7 +1960,6 @@
             
             const reader = new FileReader();
             reader.onload = (e) => {
-                selectedImageBase64 = e.target.result;
                 imagePreview.src = e.target.result;
                 imagePreviewContainer.classList.add('show');
                 imageUploadZone.style.display = 'none';
@@ -2066,7 +1969,6 @@
 
         function removeImage() {
             selectedImageFile = null;
-            selectedImageBase64 = null;
             imagePreviewContainer.classList.remove('show');
             imageUploadZone.style.display = 'block';
             document.getElementById('ordonnanceImageInput').value = '';
@@ -2094,15 +1996,12 @@
             progressDiv.classList.add('show');
             
             try {
-                const timestamp = Date.now();
-                const fileName = `ordonnances/patient_${currentPatient.id}_${timestamp}_${selectedImageFile.name}`;
-                
-                const imageUrl = await uploadToB2(selectedImageFile, fileName, (percent) => {
+                const imageUrl = await uploadImageViaVercel(selectedImageFile, (percent) => {
                     progressFill.style.width = percent + '%';
                     progressPercent.textContent = percent + '%';
                 });
                 
-                const ordonnanceId = 'ORD' + timestamp;
+                const ordonnanceId = 'ORD' + Date.now();
                 await db.collection('ordonnances').doc(ordonnanceId).set({
                     id: ordonnanceId,
                     patientId: currentPatient.id,
@@ -2154,8 +2053,6 @@
                         return (db2 ? db2.getTime() : 0) - (da ? da.getTime() : 0);
                     });
                     updateStats();
-                    
-                    // ✅ Notifications sur changements
                     detectChanges(previousOrds, myOrdonnances);
                 });
         }
@@ -2166,27 +2063,18 @@
                 if (!previousOrd) return;
                 
                 if (previousOrd.status === 'pending' && newOrd.status === 'validated') {
-                    showNativeNotification(
-                        '✅ Ordonnance validée !',
-                        `Votre demande ${newOrd.id} a été validée.`
-                    );
+                    showNativeNotification('✅ Ordonnance validée !', `Votre demande ${newOrd.id} a été validée.`);
                 }
                 
                 if (previousOrd.status === 'pending' && newOrd.status === 'refused') {
-                    showNativeNotification(
-                        '❌ Ordonnance refusée',
-                        `Motif: ${newOrd.refusalReason || 'Non spécifié'}`
-                    );
+                    showNativeNotification('❌ Ordonnance refusée', `Motif: ${newOrd.refusalReason || 'Non spécifié'}`);
                 }
                 
                 if (newOrd.produits && previousOrd.produits) {
                     const newDelivered = newOrd.produits.filter(p => p.delivered).length;
                     const prevDelivered = previousOrd.produits.filter(p => p.delivered).length;
                     if (newDelivered > prevDelivered) {
-                        showNativeNotification(
-                            '💊 Médicament délivré !',
-                            `${newDelivered}/${newOrd.produits.length} produits délivrés`
-                        );
+                        showNativeNotification('💊 Médicament délivré !', `${newDelivered}/${newOrd.produits.length} produits délivrés`);
                     }
                 }
             });
@@ -2312,7 +2200,7 @@
             openModal('detailModal');
         }
 
-        // ============ ✅ PDF AVEC QR CODE ============
+        // ============ PDF ============
         async function downloadPDF(ordId) {
             const ord = myOrdonnances.find(o => o.id === ordId);
             if (!ord) return;
@@ -2357,30 +2245,13 @@
                 doc.text(`N° Carte: ${patient.numeroCarte}`, 110, y + 20);
                 y += 42;
                 
-                // Image ordonnance si disponible
-                if (ord.imageUrl) {
-                    try {
-                        doc.setTextColor(44, 90, 160);
-                        doc.setFontSize(12);
-                        doc.setFont('helvetica', 'bold');
-                        doc.text('ORDONNANCE ORIGINALE', 14, y);
-                        y += 5;
-                        
-                        const imgData = await loadImageAsBase64(ord.imageUrl);
-                        doc.addImage(imgData, 'JPEG', 14, y, 180, 100);
-                        y += 110;
-                    } catch (e) {
-                        console.error('Erreur image:', e);
-                    }
-                }
-                
-                doc.setTextColor(44, 90, 160);
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text('MÉDICAMENTS', 14, y);
-                y += 8;
-                
                 if (ord.produits && ord.produits.length > 0) {
+                    doc.setTextColor(44, 90, 160);
+                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('MÉDICAMENTS', 14, y);
+                    y += 8;
+                    
                     doc.setFillColor(44, 90, 160);
                     doc.rect(14, y - 5, 182, 7, 'F');
                     doc.setTextColor(255, 255, 255);
@@ -2410,46 +2281,6 @@
                     y += 8;
                 }
                 
-                // ✅ QR CODE
-                if (ord.qrData) {
-                    try {
-                        const qrCanvas = document.createElement('canvas');
-                        const qrDataStr = typeof ord.qrData === 'string' ? ord.qrData : JSON.stringify(ord.qrData);
-                        
-                        // Utilisation de la librairie qrcode-generator si disponible
-                        if (typeof qrcode !== 'undefined') {
-                            const qr = qrcode(0, 'M');
-                            qr.addData(qrDataStr);
-                            qr.make();
-                            
-                            const moduleCount = qr.getModuleCount();
-                            const cellSize = 3;
-                            qrCanvas.width = moduleCount * cellSize;
-                            qrCanvas.height = moduleCount * cellSize;
-                            const ctx = qrCanvas.getContext('2d');
-                            ctx.fillStyle = '#ffffff';
-                            ctx.fillRect(0, 0, qrCanvas.width, qrCanvas.height);
-                            ctx.fillStyle = '#000000';
-                            for (let row = 0; row < moduleCount; row++) {
-                                for (let col = 0; col < moduleCount; col++) {
-                                    if (qr.isDark(row, col)) {
-                                        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
-                                    }
-                                }
-                            }
-                            
-                            const qrDataUrl = qrCanvas.toDataURL('image/png');
-                            doc.addImage(qrDataUrl, 'PNG', 150, y + 5, 45, 45);
-                            doc.setFontSize(8);
-                            doc.setFont('helvetica', 'normal');
-                            doc.setTextColor(100, 100, 100);
-                            doc.text('QR Code sécurisé', 172, y + 55, { align: 'center' });
-                        }
-                    } catch (e) {
-                        console.error('Erreur QR:', e);
-                    }
-                }
-                
                 doc.setDrawColor(100, 150, 200);
                 doc.line(14, y, 196, y);
                 y += 8;
@@ -2475,24 +2306,7 @@
             }
         }
 
-        function loadImageAsBase64(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    resolve(canvas.toDataURL('image/jpeg', 0.8));
-                };
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
-        // ============ CARTE & PHARMACIES ============
+        // ============ ✅ CARTE DES PHARMACIES AMÉLIORÉE ============
         async function loadPharmacies() {
             try {
                 const snapshot = await db.collection('pharmacies').get();
@@ -2512,6 +2326,7 @@
                     }
                 });
                 
+                // Pharmacies de démo si aucune dans la BDD
                 if (allPharmacies.length === 0) {
                     allPharmacies = [
                         { id: 'demo1', nom: 'Pharmacie Centrale', telephone: '+227 20 73 45 67', adresse: 'Avenue de la République, Niamey', lat: 13.5127, lng: 2.1128 },
@@ -2536,7 +2351,10 @@
                             lng: position.coords.longitude
                         };
                         updatePharmacyList();
-                        if (map) updateUserMarker();
+                        if (map) {
+                            updateUserMarker();
+                            map.setView([userLocation.lat, userLocation.lng], 14);
+                        }
                     },
                     error => {
                         console.warn('GPS:', error.message);
@@ -2574,7 +2392,7 @@
             })).sort((a, b) => a.distance - b.distance);
             
             container.innerHTML = pharmaciesWithDistance.map(p => `
-                <div class="pharmacy-item" onclick="selectPharmacy(${p.lat}, ${p.lng}, '${p.nom}', '${p.telephone || ''}', '${p.adresse || ''}')">
+                <div class="pharmacy-item" onclick="selectPharmacy(${p.lat}, ${p.lng}, '${p.nom.replace(/'/g, "\\'")}', '${(p.telephone || '').replace(/'/g, "\\'")}', '${(p.adresse || '').replace(/'/g, "\\'")}')" data-id="${p.id}">
                     <div class="pharmacy-icon">
                         <i class="fas fa-prescription-bottle-alt"></i>
                     </div>
@@ -2647,23 +2465,53 @@
             allPharmacies.forEach(p => {
                 const marker = L.marker([p.lat, p.lng], { icon: pharmacyIcon }).addTo(map);
                 marker.bindPopup(`
-                    <b>${p.nom}</b><br>
-                    ${p.adresse || ''}<br>
-                    ${p.telephone ? `<i class="fas fa-phone"></i> ${p.telephone}` : ''}
+                    <b style="color:#2c5aa0;">${p.nom}</b><br>
+                    <small>${p.adresse || ''}</small><br>
+                    ${p.telephone ? `<i class="fas fa-phone"></i> <a href="tel:${p.telephone}">${p.telephone}</a>` : ''}
                 `);
                 marker.on('click', () => selectPharmacy(p.lat, p.lng, p.nom, p.telephone || '', p.adresse || ''));
                 pharmacyMarkers.push(marker);
             });
         }
 
+        // ✅ SÉLECTION D'UNE PHARMACIE - AFFICHE LES BOUTONS
         async function selectPharmacy(lat, lng, name, phone, address) {
             selectedPharmacy = { lat, lng, name, phone, address };
             
-            if (routeLayer) {
-                map.removeLayer(routeLayer);
-                routeLayer = null;
+            // Mettre en surbrillance dans la liste
+            document.querySelectorAll('.pharmacy-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            const selectedItem = document.querySelector(`.pharmacy-item[onclick*="${name.replace(/'/g, "\\'")}"]`);
+            if (selectedItem) selectedItem.classList.add('selected');
+            
+            // Centrer la carte sur la pharmacie
+            if (map) {
+                map.setView([lat, lng], 16);
             }
             
+            // ✅ Mettre à jour le panneau d'information
+            document.getElementById('selectedPharmacyName').textContent = name;
+            document.getElementById('selectedPharmacyAddress').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${address || 'Adresse non disponible'}`;
+            document.getElementById('selectedPharmacyPhone').innerHTML = phone ? `<i class="fas fa-phone"></i> ${phone}` : '<i class="fas fa-phone"></i> Non disponible';
+            
+            // Calculer distance
+            if (userLocation) {
+                const distance = getDistance(userLocation.lat, userLocation.lng, lat, lng);
+                document.getElementById('routeDistance').textContent = distance < 1 ? (distance * 1000).toFixed(0) + ' m' : distance.toFixed(1) + ' km';
+                
+                // Estimation durée (vitesse moyenne 30 km/h en ville)
+                const duration = Math.max(1, Math.round((distance / 30) * 60));
+                document.getElementById('routeDuration').textContent = duration + ' min';
+            } else {
+                document.getElementById('routeDistance').textContent = '-';
+                document.getElementById('routeDuration').textContent = '-';
+            }
+            
+            // ✅ Afficher le panneau
+            document.getElementById('pharmacySelectedPanel').classList.add('active');
+            
+            // Calculer l'itinéraire réel via OSRM
             if (userLocation) {
                 try {
                     const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${userLocation.lng},${userLocation.lat};${lng},${lat}?overview=full&geometries=geojson`);
@@ -2674,6 +2522,12 @@
                         const distance = (route.distance / 1000).toFixed(1);
                         const duration = Math.round(route.duration / 60);
                         
+                        // Supprimer l'ancien itinéraire
+                        if (routeLayer) {
+                            map.removeLayer(routeLayer);
+                        }
+                        
+                        // Dessiner le nouvel itinéraire
                         routeLayer = L.geoJSON(route.geometry, {
                             style: { color: '#2c5aa0', weight: 5, opacity: 0.8 }
                         }).addTo(map);
@@ -2682,30 +2536,43 @@
                         
                         document.getElementById('routeDistance').textContent = distance + ' km';
                         document.getElementById('routeDuration').textContent = duration + ' min';
-                        document.getElementById('routeInfo').classList.add('active');
                     }
                 } catch (error) {
                     console.error('Erreur itinéraire:', error);
-                    const distance = getDistance(userLocation.lat, userLocation.lng, lat, lng);
-                    document.getElementById('routeDistance').textContent = distance < 1 ? (distance * 1000).toFixed(0) + ' m' : distance.toFixed(1) + ' km';
-                    document.getElementById('routeDuration').textContent = '-';
-                    document.getElementById('routeInfo').classList.add('active');
                 }
             }
         }
 
+        // ✅ OUVRIR L'ITINÉRAIRE DANS GOOGLE MAPS
         function openNavigation() {
-            if (!selectedPharmacy || !userLocation) return;
+            if (!selectedPharmacy) {
+                notify('⚠️ Veuillez sélectionner une pharmacie', 'warning');
+                return;
+            }
+            
+            if (!userLocation) {
+                notify('⚠️ Position GPS non disponible', 'warning');
+                return;
+            }
+            
             const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${selectedPharmacy.lat},${selectedPharmacy.lng}&travelmode=driving`;
             window.open(url, '_blank');
         }
 
+        // ✅ APPELER LA PHARMACIE
         function callPharmacy() {
-            if (selectedPharmacy && selectedPharmacy.phone) {
-                window.location.href = `tel:${selectedPharmacy.phone}`;
-            } else {
-                notify('Numéro non disponible', 'warning');
+            if (!selectedPharmacy) {
+                notify('⚠️ Veuillez sélectionner une pharmacie', 'warning');
+                return;
             }
+            
+            if (!selectedPharmacy.phone) {
+                notify('⚠️ Numéro de téléphone non disponible', 'warning');
+                return;
+            }
+            
+            // Sur mobile, ouvre l'app téléphone
+            window.location.href = `tel:${selectedPharmacy.phone}`;
         }
 
         // ============ AUTO-LOGIN ============
