@@ -1,20 +1,16 @@
-// api/upload.js - Serverless Function Vercel
-// ✅ Utilise fetch natif de Node.js 18+ (pas besoin de node-fetch)
+// api/upload.js - Version de test avec Bucket ID en dur
 
-// ✅ VOS CLÉS B2 (SECURISÉES - jamais exposées au client)
-const B2_KEY_ID = process.env.B2_KEY_ID || '786f70c49f56';
-const B2_APPLICATION_KEY = process.env.B2_APPLICATION_KEY || '0058a69c72c63bc942bcac0b73dbbfa071419c5e14';
-const B2_BUCKET_ID = process.env.B2_BUCKET_ID || 'VOTRE_BUCKET_ID'; // ⚠️ À REMPLACER
+// ✅ CLÉS B2
+const B2_KEY_ID = '786f70c49f56';
+const B2_APPLICATION_KEY = '0058a69c72c63bc942bcac0b73dbbfa071419c5e14';
+const B2_BUCKET_ID = '573866cff7c00c2499ff0516'; // ✅ Bucket ID en dur
 const B2_PUBLIC_URL = 'https://f005.backblazeb2.com/file/mutuelle';
 
-// 🔐 Authentifier avec B2
 async function authenticateB2() {
     const credentials = Buffer.from(`${B2_KEY_ID}:${B2_APPLICATION_KEY}`).toString('base64');
     
     const response = await fetch('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', {
-        headers: {
-            'Authorization': `Basic ${credentials}`
-        }
+        headers: { 'Authorization': `Basic ${credentials}` }
     });
     
     if (!response.ok) {
@@ -25,55 +21,49 @@ async function authenticateB2() {
     return await response.json();
 }
 
-// 📤 Handler principal
 export default async function handler(req, res) {
-    // ✅ CORS headers
+    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    // ✅ Preflight request
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
     
-    // ✅ Vérifier méthode
+    // ✅ Endpoint de TEST pour vérifier la config
+    if (req.method === 'GET') {
+        return res.status(200).json({
+            status: 'ok',
+            bucketId: B2_BUCKET_ID,
+            bucketIdLength: B2_BUCKET_ID.length,
+            publicUrl: B2_PUBLIC_URL,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
     
     try {
-        // Récupérer le fichier depuis le body (base64)
         const { file, fileName, mimeType } = req.body;
         
         if (!file || !fileName) {
-            return res.status(400).json({ error: 'Fichier ou nom de fichier manquant' });
+            return res.status(400).json({ error: 'Fichier ou nom manquant' });
         }
         
-        // Vérifier que B2_BUCKET_ID est configuré
-        if (!B2_BUCKET_ID || B2_BUCKET_ID === 'VOTRE_BUCKET_ID') {
-            return res.status(500).json({ 
-                error: 'B2_BUCKET_ID non configuré',
-                details: 'Veuillez configurer B2_BUCKET_ID dans les variables d\'environnement Vercel'
-            });
-        }
-        
-        // Convertir base64 en buffer
         const fileBuffer = Buffer.from(file, 'base64');
         
-        // Vérifier taille (max 5MB)
         if (fileBuffer.length > 5 * 1024 * 1024) {
             return res.status(400).json({ error: 'Fichier trop volumineux (max 5MB)' });
         }
         
-        // Authentifier avec B2
+        // Auth B2
         const b2Auth = await authenticateB2();
         
-        // ✅ Construire l'URL absolue pour get_upload_url
-        const uploadUrlEndpoint = `${b2Auth.apiUrl}/b2api/v2/b2_get_upload_url`;
-        
-        // Obtenir l'URL d'upload
-        const uploadUrlResponse = await fetch(uploadUrlEndpoint, {
+        // Obtenir URL d'upload
+        const uploadUrlResponse = await fetch(`${b2Auth.apiUrl}/b2api/v2/b2_get_upload_url`, {
             method: 'POST',
             headers: {
                 'Authorization': b2Auth.authorizationToken,
@@ -89,12 +79,7 @@ export default async function handler(req, res) {
         
         const uploadData = await uploadUrlResponse.json();
         
-        // ✅ Vérifier que uploadData.uploadUrl est une URL absolue
-        if (!uploadData.uploadUrl || !uploadData.uploadUrl.startsWith('http')) {
-            throw new Error('URL d\'upload invalide reçue de B2');
-        }
-        
-        // Uploader le fichier
+        // Upload du fichier
         const uploadResponse = await fetch(uploadData.uploadUrl, {
             method: 'POST',
             headers: {
@@ -112,8 +97,6 @@ export default async function handler(req, res) {
         }
         
         const result = await uploadResponse.json();
-        
-        // ✅ Retourner l'URL publique
         const publicUrl = `${B2_PUBLIC_URL}/${encodeURIComponent(fileName)}`;
         
         return res.status(200).json({
@@ -126,7 +109,8 @@ export default async function handler(req, res) {
         console.error('❌ Erreur upload:', error);
         return res.status(500).json({ 
             error: error.message,
-            details: 'Erreur lors de l\'upload vers Backblaze B2'
+            bucketId: B2_BUCKET_ID,
+            bucketIdLength: B2_BUCKET_ID.length
         });
     }
 }
