@@ -1059,7 +1059,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ========== PAGE D'ATTENTE D'APPROBATION - VERSION JOYEUSE ========== */
+        /* ========== PAGE D'ATTENTE D'APPROBATION ========== */
         .approval-pending-screen {
             display: none;
             flex-direction: column;
@@ -1306,10 +1306,6 @@
             transition: transform 0.3s;
         }
 
-        .approval-pending-screen .info-step:hover {
-            transform: translateY(-3px);
-        }
-
         .approval-pending-screen .info-step .step-icon {
             font-size: 28px;
             margin-bottom: 6px;
@@ -1344,58 +1340,60 @@
             border: 1px solid rgba(44, 90, 160, 0.2);
         }
 
-        .logout-btn-pending:hover {
-            background: rgba(44, 90, 160, 0.15);
-            transform: translateY(-2px);
-        }
-
         .logout-btn-pending:active {
             transform: scale(0.95);
         }
 
-        /* Version rejetée */
-        .approval-pending-screen.rejected .main-icon {
-            background: linear-gradient(135deg, #dc3545, #c0392b);
+        .account-status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 8px;
         }
 
-        .approval-pending-screen.rejected h2 {
-            color: #dc3545;
+        .account-status-badge.approved {
+            background: #d4edda;
+            color: #155724;
         }
 
-        .approval-pending-screen.rejected .subtitle {
-            color: #c0392b;
+        .account-status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
         }
 
-        .approval-pending-screen.rejected .message-box {
-            border-color: rgba(220, 53, 69, 0.2);
+        .account-status-badge.rejected {
+            background: #f8d7da;
+            color: #721c24;
         }
 
-        .approval-pending-screen.rejected .message-box .highlight {
-            color: #dc3545;
+        .forgot-password-link {
+            display: block;
+            text-align: right;
+            font-size: 12px;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: 8px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
-        /* Version approuvée */
-        .approval-pending-screen.approved .main-icon {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 16px;
+            background: none;
+            border: none;
+            padding: 0;
         }
 
-        .approval-pending-screen.approved h2 {
-            color: #28a745;
-        }
-
-        .approval-pending-screen.approved .subtitle {
-            color: #1e7e34;
-        }
-
-        .approval-pending-screen.approved .message-box {
-            border-color: rgba(40, 167, 69, 0.2);
-        }
-
-        .approval-pending-screen.approved .message-box .highlight {
-            color: #28a745;
-        }
-
-        /* Confettis animés */
         .confetti-container {
             position: fixed;
             top: 0;
@@ -1426,29 +1424,53 @@
             }
         }
 
-        .account-status-badge {
-            display: inline-block;
-            padding: 3px 12px;
+        /* Animations pour les fonctionnalités */
+        .anim-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .anim-item {
+            flex: 0 0 calc(50% - 6px);
+            max-width: calc(50% - 6px);
+            background: var(--bg-card);
             border-radius: 12px;
+            padding: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .anim-item video {
+            width: 100%;
+            max-height: 80px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .anim-item .anim-label {
             font-size: 10px;
-            font-weight: 700;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 4px;
             text-transform: uppercase;
-            margin-left: 8px;
+            letter-spacing: 0.5px;
         }
 
-        .account-status-badge.approved {
-            background: #d4edda;
-            color: #155724;
+        .action-anim {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 8px;
+            overflow: hidden;
         }
 
-        .account-status-badge.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .account-status-badge.rejected {
-            background: #f8d7da;
-            color: #721c24;
+        .action-anim video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -1457,7 +1479,9 @@
         <!-- AUTH SCREEN -->
         <div id="authScreen" class="auth-container">
             <div class="auth-header">
-                <i class="fas fa-shield-alt"></i>
+                <video autoplay loop muted playsinline style="width:80px; height:80px; margin:0 auto 10px; display:block; object-fit:contain;">
+                    <source src="https://cdnl.iconscout.com/lottie/premium/preview-watermark/medical-store-animation-gif-download-13539829.mp4" type="video/mp4">
+                </video>
                 <h1>MiliSoin</h1>
                 <p>Mutuelle Militaire du Niger</p>
             </div>
@@ -1476,6 +1500,7 @@
                         <label>Mot de passe</label>
                         <input type="password" id="loginPassword" placeholder="••••••••" required>
                     </div>
+                    <a class="forgot-password-link" onclick="showResetPassword()">🔑 Mot de passe oublié ?</a>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-sign-in-alt"></i> Se connecter
                     </button>
@@ -1519,7 +1544,7 @@
                     </div>
                     <div class="form-group">
                         <label>Date de naissance</label>
-                        <input type="date" id="regDateNaissance" required>
+                        <input type="date" id="regDateNaissance" required value="1999-01-01">
                     </div>
                     <div class="form-group">
                         <label>Unité</label>
@@ -1555,10 +1580,41 @@
                         <i class="fas fa-user-plus"></i> Créer mon compte
                     </button>
                 </form>
+
+                <!-- Reset Password Form avec envoi réel -->
+                <form id="resetPasswordForm" class="auth-form" style="display:none;" onsubmit="return handleResetPassword(event)">
+                    <button type="button" class="back-link" onclick="showLoginForm()">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </button>
+                    <h3 style="margin-bottom:16px; color:var(--text-primary);">🔑 Réinitialisation</h3>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="resetEmail" placeholder="votre@email.com" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="sendResetCode()" id="sendCodeBtn">
+                        <i class="fas fa-envelope"></i> Envoyer le code
+                    </button>
+                    <div style="margin: 12px 0; text-align:center; color:var(--text-secondary); font-size:12px;">--- ou ---</div>
+                    <div class="form-group">
+                        <label>Code de réinitialisation</label>
+                        <input type="text" id="resetCode" placeholder="Code reçu par email">
+                    </div>
+                    <div class="form-group">
+                        <label>Nouveau mot de passe</label>
+                        <input type="password" id="resetNewPassword" placeholder="••••••••" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmer</label>
+                        <input type="password" id="resetConfirmPassword" placeholder="••••••••" minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-sync-alt"></i> Réinitialiser
+                    </button>
+                </form>
             </div>
         </div>
 
-        <!-- PAGE D'ATTENTE D'APPROBATION - VERSION JOYEUSE -->
+        <!-- PAGE D'ATTENTE D'APPROBATION -->
         <div id="approvalPendingScreen" class="approval-pending-screen">
             <div class="bg-decoration d1"></div>
             <div class="bg-decoration d2"></div>
@@ -1668,6 +1724,16 @@
                         </div>
                     </div>
 
+                    <!-- Animations des services -->
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-video"></i> Services MiliSoin
+                        </div>
+                        <div class="anim-container" id="homeAnimations">
+                            <!-- Injecté par JavaScript -->
+                        </div>
+                    </div>
+
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value" id="statPending">0</div>
@@ -1689,29 +1755,37 @@
 
                     <div class="action-grid">
                         <div class="action-btn" onclick="openSendModal()">
-                            <div class="action-icon blue">
-                                <i class="fas fa-camera"></i>
+                            <div class="action-anim">
+                                <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;">
+                                    <source src="https://cdnl.iconscout.com/lottie/premium/preview-watermark/medical-store-animation-gif-download-13539829.mp4" type="video/mp4">
+                                </video>
                             </div>
                             <h3>Nouvelle demande</h3>
                             <p>Photo ordonnance</p>
                         </div>
                         <div class="action-btn" onclick="switchPage('map')">
-                            <div class="action-icon green">
-                                <i class="fas fa-map-marker-alt"></i>
+                            <div class="action-anim">
+                                <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;">
+                                    <source src="https://cdnl.iconscout.com/lottie/premium/preview-watermark/hospital-location-animation-gif-download-10137386.mp4" type="video/mp4">
+                                </video>
                             </div>
                             <h3>Pharmacies</h3>
                             <p>À proximité</p>
                         </div>
                         <div class="action-btn" onclick="switchPage('orders')">
-                            <div class="action-icon orange">
-                                <i class="fas fa-file-medical"></i>
+                            <div class="action-anim">
+                                <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;">
+                                    <source src="https://cdnl.iconscout.com/lottie/premium/preview-watermark/pills-alert-animation-gif-download-6983472.mp4" type="video/mp4">
+                                </video>
                             </div>
                             <h3>Mes demandes</h3>
                             <p>Historique complet</p>
                         </div>
                         <div class="action-btn" onclick="switchPage('profile')">
-                            <div class="action-icon purple">
-                                <i class="fas fa-user"></i>
+                            <div class="action-anim">
+                                <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:contain;">
+                                    <source src="https://cdnl.iconscout.com/lottie/premium/preview-watermark/doctor-checking-a-patients-heartbeat-animation-gif-download-12176274.mp4" type="video/mp4">
+                                </video>
                             </div>
                             <h3>Profil</h3>
                             <p>Paramètres</p>
@@ -2059,8 +2133,6 @@
         function launchConfetti() {
             const container = document.getElementById('confettiContainer');
             const colors = ['#2c5aa0', '#28a745', '#fd7e14', '#dc3545', '#ffc107', '#6f42c1', '#e83e8c', '#20c997'];
-            
-            // Nettoyer les anciens confettis
             container.innerHTML = '';
             
             for (let i = 0; i < 80; i++) {
@@ -2192,6 +2264,126 @@
 
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // ============ RÉINITIALISATION MOT DE PASSE (RÉEL AVEC FIREBASE) ============
+        function showResetPassword() {
+            document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+            document.getElementById('resetPasswordForm').style.display = 'block';
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            // Réinitialiser les champs
+            document.getElementById('resetEmail').value = '';
+            document.getElementById('resetCode').value = '';
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetConfirmPassword').value = '';
+        }
+
+        function showLoginForm() {
+            document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+            document.getElementById('loginForm').style.display = 'block';
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.auth-tab[data-tab="login"]').classList.add('active');
+        }
+
+        // Envoyer le code de réinitialisation via Firebase Auth
+        async function sendResetCode() {
+            const email = document.getElementById('resetEmail').value.trim();
+            if (!email) {
+                notify('Veuillez entrer votre adresse email', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('sendCodeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+
+            try {
+                // Envoyer l'email de réinitialisation avec Firebase
+                await auth.sendPasswordResetEmail(email, {
+                    url: window.location.href,
+                    handleCodeInApp: false
+                });
+                notify('✅ Un code de réinitialisation a été envoyé à votre email.', 'success');
+                
+                // Afficher le champ code et mot de passe
+                document.querySelector('#resetPasswordForm .form-group:nth-child(4)').style.display = 'block';
+                document.querySelector('#resetPasswordForm .form-group:nth-child(5)').style.display = 'block';
+                document.querySelector('#resetPasswordForm .form-group:nth-child(6)').style.display = 'block';
+                document.querySelector('#resetPasswordForm .btn-success').style.display = 'block';
+                
+            } catch (error) {
+                let msg = 'Erreur lors de l\'envoi du code';
+                if (error.code === 'auth/user-not-found') {
+                    msg = 'Aucun compte trouvé avec cette adresse email.';
+                } else if (error.code === 'auth/invalid-email') {
+                    msg = 'Adresse email invalide.';
+                } else {
+                    msg = error.message;
+                }
+                notify('❌ ' + msg, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-envelope"></i> Envoyer le code';
+            }
+        }
+
+        // Gérer la réinitialisation avec le code
+        async function handleResetPassword(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value.trim();
+            const code = document.getElementById('resetCode').value.trim();
+            const newPass = document.getElementById('resetNewPassword').value;
+            const confirmPass = document.getElementById('resetConfirmPassword').value;
+
+            if (!email) {
+                notify('Veuillez entrer votre email', 'warning');
+                return;
+            }
+            if (!code) {
+                notify('Veuillez entrer le code reçu par email', 'warning');
+                return;
+            }
+            if (newPass.length < 6) {
+                notify('Le mot de passe doit contenir au moins 6 caractères', 'warning');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                notify('Les mots de passe ne correspondent pas', 'error');
+                return;
+            }
+
+            try {
+                // Vérifier le code et mettre à jour le mot de passe
+                await auth.confirmPasswordReset(code, newPass);
+                notify('✅ Mot de passe réinitialisé avec succès !', 'success');
+                showLoginForm();
+                
+                // Réinitialiser les champs
+                document.getElementById('resetEmail').value = '';
+                document.getElementById('resetCode').value = '';
+                document.getElementById('resetNewPassword').value = '';
+                document.getElementById('resetConfirmPassword').value = '';
+                
+                // Masquer les champs supplémentaires
+                document.querySelectorAll('#resetPasswordForm .form-group:nth-child(4), #resetPasswordForm .form-group:nth-child(5), #resetPasswordForm .form-group:nth-child(6)').forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.querySelector('#resetPasswordForm .btn-success').style.display = 'none';
+                
+            } catch (error) {
+                let msg = 'Erreur lors de la réinitialisation';
+                if (error.code === 'auth/expired-action-code') {
+                    msg = 'Le code a expiré. Veuillez en demander un nouveau.';
+                } else if (error.code === 'auth/invalid-action-code') {
+                    msg = 'Code invalide. Vérifiez votre email.';
+                } else if (error.code === 'auth/user-not-found') {
+                    msg = 'Aucun compte trouvé avec cette adresse email.';
+                } else {
+                    msg = error.message;
+                }
+                notify('❌ ' + msg, 'error');
+            }
+        }
 
         // ============ NOTIFICATIONS ============
         function getNotifSettings() {
@@ -2362,9 +2554,13 @@
         document.querySelectorAll('.auth-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
                 tab.classList.add('active');
-                document.getElementById(tab.dataset.tab === 'login' ? 'loginForm' : 'registerForm').classList.add('active');
+                if (tab.dataset.tab === 'login') {
+                    document.getElementById('loginForm').style.display = 'block';
+                } else {
+                    document.getElementById('registerForm').style.display = 'block';
+                }
             });
         });
 
@@ -2461,6 +2657,31 @@
             requestNotificationPermission();
             loadNotifSettings();
             startBackgroundChecks();
+            loadAnimations();
+        }
+
+        function loadAnimations() {
+            const animations = [
+                { id: 'anim-pharmacie', label: 'Pharmacie', url: 'https://cdnl.iconscout.com/lottie/premium/preview-watermark/medical-store-animation-gif-download-13539829.mp4' },
+                { id: 'anim-medicaments', label: 'Médicaments', url: 'https://cdnl.iconscout.com/lottie/premium/preview-watermark/medicine-animation-gif-download-11090504.mp4' },
+                { id: 'anim-hygiene', label: 'Hygiène', url: 'https://cdnl.iconscout.com/lottie/premium/preview-watermark/hand-sanitizer-animation-gif-download-12176270.mp4' },
+                { id: 'anim-urgence', label: 'Urgence', url: 'https://cdnl.iconscout.com/lottie/premium/preview-watermark/ambulance-animation-gif-download-12176285.mp4' }
+            ];
+
+            const container = document.getElementById('homeAnimations');
+            container.innerHTML = '';
+            
+            animations.forEach(anim => {
+                const div = document.createElement('div');
+                div.className = 'anim-item';
+                div.innerHTML = `
+                    <video autoplay loop muted playsinline>
+                        <source src="${anim.url}" type="video/mp4">
+                    </video>
+                    <div class="anim-label">${anim.label}</div>
+                `;
+                container.appendChild(div);
+            });
         }
 
         function loadDashboard() {
@@ -3274,6 +3495,9 @@
                 document.getElementById('approvalPendingScreen').classList.remove('active');
             }
         });
+
+        // Attacher le gestionnaire de réinitialisation
+        document.getElementById('resetPasswordForm').addEventListener('submit', handleResetPassword);
     </script>
 </body>
 </html>
