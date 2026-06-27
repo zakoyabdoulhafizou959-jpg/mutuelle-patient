@@ -1059,105 +1059,373 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ✅ NOUVEAU : Page d'attente d'approbation */
+        /* ========== PAGE D'ATTENTE D'APPROBATION - VERSION JOYEUSE ========== */
         .approval-pending-screen {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: var(--bg-primary);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8edf5 100%);
             padding: 30px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
         .approval-pending-screen.active {
             display: flex;
         }
 
-        .approval-icon {
+        .approval-pending-screen .bg-decoration {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .approval-pending-screen .bg-decoration.d1 {
+            width: 300px;
+            height: 300px;
+            background: #2c5aa0;
+            top: -100px;
+            right: -100px;
+        }
+
+        .approval-pending-screen .bg-decoration.d2 {
+            width: 200px;
+            height: 200px;
+            background: #28a745;
+            bottom: -50px;
+            left: -50px;
+        }
+
+        .approval-pending-screen .bg-decoration.d3 {
+            width: 150px;
+            height: 150px;
+            background: #fd7e14;
+            top: 50%;
+            left: 10%;
+        }
+
+        .approval-content {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .approval-icon-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .approval-icon-container .main-icon {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--warning), #e0a800);
+            background: linear-gradient(135deg, #2c5aa0, #4a7fd4);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
+            font-size: 55px;
             color: white;
-            margin-bottom: 30px;
-            animation: pulse 2s ease-in-out infinite;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(44, 90, 160, 0.3);
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .approval-icon-container .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(44, 90, 160, 0.2);
+            animation: ringPulse 3s ease-in-out infinite;
+        }
+
+        .approval-icon-container .ring.r1 {
+            width: 140px;
+            height: 140px;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+
+        .approval-icon-container .ring.r2 {
+            width: 170px;
+            height: 170px;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.5s;
+        }
+
+        .approval-icon-container .ring.r3 {
+            width: 200px;
+            height: 200px;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes ringPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.3; }
+            50% { transform: translateX(-50%) scale(1.1); opacity: 0.05; }
+        }
+
+        .approval-icon-container .sparkle {
+            position: absolute;
+            color: #fd7e14;
+            font-size: 20px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        .approval-icon-container .sparkle.s1 { top: -10px; right: -10px; animation-delay: 0s; }
+        .approval-icon-container .sparkle.s2 { bottom: -5px; left: -5px; animation-delay: 0.7s; }
+        .approval-icon-container .sparkle.s3 { top: 30%; right: -20px; animation-delay: 1.4s; }
+        .approval-icon-container .sparkle.s4 { bottom: 30%; left: -20px; animation-delay: 0.3s; }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
         }
 
         .approval-pending-screen h2 {
-            font-size: 22px;
-            color: var(--text-primary);
-            margin-bottom: 12px;
+            font-size: 28px;
+            font-weight: 800;
+            color: #2c5aa0;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
         }
 
-        .approval-pending-screen p {
-            font-size: 15px;
-            color: var(--text-secondary);
-            max-width: 400px;
-            margin-bottom: 8px;
-            line-height: 1.6;
-        }
-
-        .approval-pending-screen .status-badge {
-            font-size: 14px;
-            padding: 8px 20px;
-            margin-top: 15px;
-        }
-
-        .approval-pending-screen .logout-btn-pending {
-            margin-top: 30px;
-            padding: 14px 40px;
-            border: none;
-            border-radius: 12px;
-            background: var(--danger);
-            color: white;
+        .approval-pending-screen .subtitle {
             font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: #4a6fa5;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
 
-        .approval-pending-screen .logout-btn-pending:active {
-            transform: scale(0.95);
+        .approval-pending-screen .message-box {
+            background: white;
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin: 15px 0 25px 0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(44, 90, 160, 0.1);
+        }
+
+        .approval-pending-screen .message-box p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 8px;
+        }
+
+        .approval-pending-screen .message-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .approval-pending-screen .message-box .highlight {
+            color: #2c5aa0;
+            font-weight: 700;
+        }
+
+        .approval-pending-screen .message-box .emoji-big {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
         }
 
         .approval-status-badge {
             display: inline-block;
-            padding: 6px 18px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 14px;
             font-weight: 700;
-            margin-top: 15px;
-        }
-
-        .approval-status-badge.approved {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .approval-status-badge.rejected {
-            background: #f8d7da;
-            color: #721c24;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .approval-status-badge.pending {
-            background: #fff3cd;
-            color: #856404;
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #fff;
+            animation: pulseBadge 2s ease-in-out infinite;
         }
 
-        /* ✅ NOUVEAU : Badge de statut de compte sur la carte */
+        .approval-status-badge.approved {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .approval-status-badge.rejected {
+            background: linear-gradient(135deg, #dc3545, #c0392b);
+            color: white;
+        }
+
+        @keyframes pulseBadge {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3); }
+            50% { transform: scale(1.03); box-shadow: 0 4px 25px rgba(255, 193, 7, 0.5); }
+        }
+
+        .approval-pending-screen .info-steps {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0 30px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .approval-pending-screen .info-step {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            flex: 1;
+            min-width: 100px;
+            max-width: 150px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: transform 0.3s;
+        }
+
+        .approval-pending-screen .info-step:hover {
+            transform: translateY(-3px);
+        }
+
+        .approval-pending-screen .info-step .step-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .approval-pending-screen .info-step .step-label {
+            font-size: 11px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .approval-pending-screen .info-step .step-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c5aa0;
+        }
+
+        .logout-btn-pending {
+            margin-top: 10px;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(44, 90, 160, 0.1);
+            color: #2c5aa0;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            border: 1px solid rgba(44, 90, 160, 0.2);
+        }
+
+        .logout-btn-pending:hover {
+            background: rgba(44, 90, 160, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn-pending:active {
+            transform: scale(0.95);
+        }
+
+        /* Version rejetée */
+        .approval-pending-screen.rejected .main-icon {
+            background: linear-gradient(135deg, #dc3545, #c0392b);
+        }
+
+        .approval-pending-screen.rejected h2 {
+            color: #dc3545;
+        }
+
+        .approval-pending-screen.rejected .subtitle {
+            color: #c0392b;
+        }
+
+        .approval-pending-screen.rejected .message-box {
+            border-color: rgba(220, 53, 69, 0.2);
+        }
+
+        .approval-pending-screen.rejected .message-box .highlight {
+            color: #dc3545;
+        }
+
+        /* Version approuvée */
+        .approval-pending-screen.approved .main-icon {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+
+        .approval-pending-screen.approved h2 {
+            color: #28a745;
+        }
+
+        .approval-pending-screen.approved .subtitle {
+            color: #1e7e34;
+        }
+
+        .approval-pending-screen.approved .message-box {
+            border-color: rgba(40, 167, 69, 0.2);
+        }
+
+        .approval-pending-screen.approved .message-box .highlight {
+            color: #28a745;
+        }
+
+        /* Confettis animés */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: confettiFall linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
         .account-status-badge {
             display: inline-block;
             padding: 3px 12px;
@@ -1290,20 +1558,62 @@
             </div>
         </div>
 
-        <!-- ✅ NOUVEAU : PAGE D'ATTENTE D'APPROBATION -->
+        <!-- PAGE D'ATTENTE D'APPROBATION - VERSION JOYEUSE -->
         <div id="approvalPendingScreen" class="approval-pending-screen">
-            <div class="approval-icon">
-                <i class="fas fa-clock"></i>
+            <div class="bg-decoration d1"></div>
+            <div class="bg-decoration d2"></div>
+            <div class="bg-decoration d3"></div>
+            
+            <div class="approval-content">
+                <div class="approval-icon-container">
+                    <div class="ring r1"></div>
+                    <div class="ring r2"></div>
+                    <div class="ring r3"></div>
+                    <div class="main-icon" id="approvalMainIcon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="sparkle s1"><i class="fas fa-star"></i></div>
+                    <div class="sparkle s2"><i class="fas fa-star"></i></div>
+                    <div class="sparkle s3"><i class="fas fa-star"></i></div>
+                    <div class="sparkle s4"><i class="fas fa-star"></i></div>
+                </div>
+
+                <h2 id="approvalTitle">🎉 Bienvenue parmi nous !</h2>
+                <p class="subtitle" id="approvalSubtitle">Votre compte est en cours de validation</p>
+
+                <div class="message-box" id="approvalMessage">
+                    <span class="emoji-big">🤝</span>
+                    <p>Merci pour votre inscription à <span class="highlight">MiliSoin</span> !</p>
+                    <p>Votre demande sera examinée avec attention par l'assistant de votre corps d'armée.</p>
+                    <p style="font-size:14px; color:#888; margin-top:10px;">⏳ Cela peut prendre quelques heures ou jours.</p>
+                </div>
+
+                <div id="approvalStatusBadge" class="approval-status-badge pending">
+                    ⏳ En attente de validation
+                </div>
+
+                <div class="info-steps">
+                    <div class="info-step">
+                        <div class="step-icon">📋</div>
+                        <div class="step-label">Étape 1</div>
+                        <div class="step-text">Inscription</div>
+                    </div>
+                    <div class="info-step">
+                        <div class="step-icon">👀</div>
+                        <div class="step-label">Étape 2</div>
+                        <div class="step-text">Vérification</div>
+                    </div>
+                    <div class="info-step">
+                        <div class="step-icon">✅</div>
+                        <div class="step-label">Étape 3</div>
+                        <div class="step-text">Validation</div>
+                    </div>
+                </div>
+
+                <button class="logout-btn-pending" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                </button>
             </div>
-            <h2>📋 Compte en attente de validation</h2>
-            <p>Votre compte sera examiné par le service mutuelle.</p>
-            <p style="font-size: 13px; color: var(--text-secondary);">Veuillez patienter, vous recevrez une notification dès que votre compte sera approuvé.</p>
-            <div id="approvalStatusBadge" class="approval-status-badge pending">
-                ⏳ En attente d'approbation
-            </div>
-            <button class="logout-btn-pending" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Se déconnecter
-            </button>
         </div>
 
         <!-- MAIN APP -->
@@ -1652,9 +1962,13 @@
         </div>
     </div>
 
+    <!-- Image Zoom -->
     <div class="image-zoom" id="imageZoom" onclick="this.classList.remove('active')">
         <img id="zoomImage" src="" alt="Zoom">
     </div>
+
+    <!-- Confettis Container -->
+    <div class="confetti-container" id="confettiContainer"></div>
 
     <div class="notification" id="notification"></div>
 
@@ -1740,6 +2054,97 @@
         let bgCheckInterval = null;
         let lastKnownStatuses = {};
         let patientStatusListener = null;
+
+        // ============ CONFETTIS ============
+        function launchConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#2c5aa0', '#28a745', '#fd7e14', '#dc3545', '#ffc107', '#6f42c1', '#e83e8c', '#20c997'];
+            
+            // Nettoyer les anciens confettis
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 80; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                const size = Math.random() * 8 + 4;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const duration = Math.random() * 2 + 2;
+                const delay = Math.random() * 3;
+                const shape = Math.random() > 0.5 ? '50%' : '2px';
+                
+                confetti.style.cssText = `
+                    left: ${left}%;
+                    width: ${size}px;
+                    height: ${size * (Math.random() * 2 + 0.5)}px;
+                    background: ${color};
+                    border-radius: ${shape};
+                    animation-duration: ${duration}s;
+                    animation-delay: ${delay}s;
+                    transform: rotate(${Math.random() * 360}deg);
+                `;
+                container.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), (duration + delay) * 1000 + 500);
+            }
+        }
+
+        // ============ AFFICHAGE PAGE APPROBATION ============
+        function showApprovalScreen(status, reason) {
+            const screen = document.getElementById('approvalPendingScreen');
+            screen.classList.remove('pending', 'approved', 'rejected');
+            screen.classList.add('active');
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            
+            const icon = document.getElementById('approvalMainIcon');
+            const title = document.getElementById('approvalTitle');
+            const subtitle = document.getElementById('approvalSubtitle');
+            const message = document.getElementById('approvalMessage');
+            const badge = document.getElementById('approvalStatusBadge');
+            
+            if (status === 'pending') {
+                screen.classList.add('pending');
+                icon.innerHTML = '<i class="fas fa-clock"></i>';
+                title.textContent = '🎉 Bienvenue parmi nous !';
+                subtitle.textContent = 'Votre compte est en cours de validation';
+                message.innerHTML = `
+                    <span class="emoji-big">🤝</span>
+                    <p>Merci pour votre inscription à <span class="highlight">MiliSoin</span> !</p>
+                    <p>Votre demande sera examinée avec attention par l'assistant de votre corps d'armée.</p>
+                    <p style="font-size:14px; color:#888; margin-top:10px;">⏳ Cela peut prendre quelques heures ou jours.</p>
+                `;
+                badge.className = 'approval-status-badge pending';
+                badge.textContent = '⏳ En attente de validation';
+            } else if (status === 'approved') {
+                screen.classList.add('approved');
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                title.textContent = '🎊 Félicitations !';
+                subtitle.textContent = 'Votre compte a été validé avec succès';
+                message.innerHTML = `
+                    <span class="emoji-big">🎉</span>
+                    <p>Votre compte <span class="highlight">MiliSoin</span> est maintenant actif !</p>
+                    <p>Vous pouvez accéder à tous les services de la mutuelle militaire.</p>
+                    <p style="font-size:14px; color:#28a745; margin-top:10px;">✅ Bienvenue dans la famille MiliSoin !</p>
+                `;
+                badge.className = 'approval-status-badge approved';
+                badge.textContent = '✅ Compte validé';
+                launchConfetti();
+            } else if (status === 'rejected') {
+                screen.classList.add('rejected');
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                title.textContent = '😔 Nous sommes désolés';
+                subtitle.textContent = 'Votre demande n\'a pas été retenue';
+                message.innerHTML = `
+                    <span class="emoji-big">📋</span>
+                    <p>Votre demande d'inscription à <span class="highlight">MiliSoin</span> a été rejetée.</p>
+                    <p><strong>Motif :</strong> ${reason || 'Non spécifié'}</p>
+                    <p style="font-size:14px; color:#888; margin-top:10px;">Vous pouvez contacter le service mutuelle pour plus d'informations.</p>
+                `;
+                badge.className = 'approval-status-badge rejected';
+                badge.textContent = '❌ Compte rejeté';
+            }
+        }
 
         // ============ UTILITAIRES ============
         function parseDate(ts) {
@@ -1912,18 +2317,16 @@
                     const status = data.approvalStatus || 'pending';
                     
                     if (status === 'approved') {
-                        // Compte approuvé - montrer l'application
                         if (!document.getElementById('mainApp').style.display || document.getElementById('mainApp').style.display === 'none') {
                             showMainApp();
+                            setTimeout(launchConfetti, 500);
                         }
                     } else if (status === 'rejected') {
-                        // Compte rejeté
                         if (document.getElementById('mainApp').style.display !== 'none') {
                             document.getElementById('mainApp').style.display = 'none';
                         }
                         showApprovalScreen('rejected', data.rejectionReason);
                     } else {
-                        // En attente
                         if (document.getElementById('mainApp').style.display !== 'none') {
                             document.getElementById('mainApp').style.display = 'none';
                         }
@@ -1931,29 +2334,6 @@
                     }
                 }
             });
-        }
-
-        function showApprovalScreen(status, reason) {
-            const screen = document.getElementById('approvalPendingScreen');
-            screen.classList.add('active');
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'none';
-            
-            const badge = document.getElementById('approvalStatusBadge');
-            
-            if (status === 'pending') {
-                badge.className = 'approval-status-badge pending';
-                badge.textContent = '⏳ En attente d\'approbation';
-                document.querySelector('.approval-icon').style.background = 'linear-gradient(135deg, var(--warning), #e0a800)';
-                document.querySelector('.approval-pending-screen h2').textContent = '📋 Compte en attente de validation';
-                document.querySelector('.approval-pending-screen p').textContent = 'Votre compte sera examiné par le service mutuelle.';
-            } else if (status === 'rejected') {
-                badge.className = 'approval-status-badge rejected';
-                badge.textContent = '❌ Compte rejeté';
-                document.querySelector('.approval-icon').style.background = 'linear-gradient(135deg, var(--danger), #c0392b)';
-                document.querySelector('.approval-pending-screen h2').textContent = '❌ Compte non approuvé';
-                document.querySelector('.approval-pending-screen p').textContent = reason || 'Votre demande d\'inscription a été rejetée. Contactez le service mutuelle pour plus d\'informations.';
-            }
         }
 
         // ============ THEME ============
@@ -2000,14 +2380,12 @@
                     currentUser = cred.user;
                     currentPatient = { id: patientDoc.id, ...patientDoc.data() };
                     
-                    // Vérifier le statut d'approbation
                     const status = currentPatient.approvalStatus || 'pending';
                     
                     if (status === 'approved') {
                         notify('✅ Connexion réussie', 'success');
                         showMainApp();
                     } else {
-                        // Compte pas encore approuvé
                         startPatientStatusListener(cred.user.uid);
                         showApprovalScreen(status, currentPatient.rejectionReason);
                     }
@@ -2051,7 +2429,6 @@
                     corps: document.getElementById('regCorps').value,
                     numeroCarte: document.getElementById('regNumeroCarte').value.trim(),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    // ✅ NOUVEAU : Statut d'approbation
                     approvalStatus: 'pending',
                     approvalRequestedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
@@ -2060,7 +2437,6 @@
                 currentUser = cred.user;
                 currentPatient = { id: cred.user.uid, ...patientData };
                 
-                // ✅ Afficher la page d'attente
                 startPatientStatusListener(cred.user.uid);
                 showApprovalScreen('pending');
                 notify('✅ Inscription réussie ! Votre compte sera examiné par le service mutuelle.', 'success');
@@ -2095,7 +2471,6 @@
             document.getElementById('cardCorps').textContent = currentPatient.corps || '-';
             document.getElementById('cardNumero').textContent = `N° ${currentPatient.numeroCarte || 'MSM-NI-2025-000000'}`;
             
-            // ✅ Afficher le statut sur la carte
             const statusEl = document.getElementById('cardStatus');
             const status = currentPatient.approvalStatus || 'pending';
             if (status === 'approved') {
@@ -2110,7 +2485,6 @@
             document.getElementById('profileGrade').textContent = currentPatient.grade || '';
             document.getElementById('profileAvatar').textContent = (currentPatient.prenom || currentPatient.nom || '?').charAt(0).toUpperCase();
             
-            // ✅ Statut dans le profil
             const profileStatus = document.getElementById('profileStatus');
             if (status === 'approved') {
                 profileStatus.innerHTML = '<span class="account-status-badge approved">✅ Compte approuvé</span>';
@@ -2232,7 +2606,7 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     produits: [],
                     imageDeleted: false,
-                    corps: currentPatient.corps  // ✅ AJOUT : pour le filtrage par corps
+                    corps: currentPatient.corps
                 });
                 
                 notify('✅ Demande envoyée !', 'success');
@@ -2504,7 +2878,6 @@
                     y += 8;
                 }
                 
-                // QR CODE
                 if (ord.qrData) {
                     try {
                         const qrStr = typeof ord.qrData === 'string' ? ord.qrData : JSON.stringify(ord.qrData);
