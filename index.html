@@ -632,6 +632,7 @@
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-secondary { background: var(--input-bg); color: var(--text-primary); }
+        .btn-warning { background: var(--warning); color: #000; }
         
         .image-upload-zone {
             border: 3px dashed var(--primary);
@@ -1057,6 +1058,130 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* ✅ NOUVEAU : Page d'attente d'approbation */
+        .approval-pending-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .approval-pending-screen.active {
+            display: flex;
+        }
+
+        .approval-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--warning), #e0a800);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+            margin-bottom: 30px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .approval-pending-screen h2 {
+            font-size: 22px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .approval-pending-screen p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .approval-pending-screen .status-badge {
+            font-size: 14px;
+            padding: 8px 20px;
+            margin-top: 15px;
+        }
+
+        .approval-pending-screen .logout-btn-pending {
+            margin-top: 30px;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 12px;
+            background: var(--danger);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .approval-pending-screen .logout-btn-pending:active {
+            transform: scale(0.95);
+        }
+
+        .approval-status-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 15px;
+        }
+
+        .approval-status-badge.approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .approval-status-badge.rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .approval-status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* ✅ NOUVEAU : Badge de statut de compte sur la carte */
+        .account-status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .account-status-badge.approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .account-status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .account-status-badge.rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -1128,12 +1253,10 @@
                         <label>Date de naissance</label>
                         <input type="date" id="regDateNaissance" required>
                     </div>
-                    <!-- ✅ MODIFICATION 1 : Unité = champ texte libre -->
                     <div class="form-group">
                         <label>Unité</label>
                         <input type="text" id="regUnite" placeholder="Ex: 1er Bataillon, État-Major..." required>
                     </div>
-                    <!-- ✅ MODIFICATION 2 : Corps = select FAN/GNN/GN/PN -->
                     <div class="form-group">
                         <label>Corps</label>
                         <select id="regCorps" required>
@@ -1165,6 +1288,22 @@
                     </button>
                 </form>
             </div>
+        </div>
+
+        <!-- ✅ NOUVEAU : PAGE D'ATTENTE D'APPROBATION -->
+        <div id="approvalPendingScreen" class="approval-pending-screen">
+            <div class="approval-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h2>📋 Compte en attente de validation</h2>
+            <p>Votre compte sera examiné par le service mutuelle.</p>
+            <p style="font-size: 13px; color: var(--text-secondary);">Veuillez patienter, vous recevrez une notification dès que votre compte sera approuvé.</p>
+            <div id="approvalStatusBadge" class="approval-status-badge pending">
+                ⏳ En attente d'approbation
+            </div>
+            <button class="logout-btn-pending" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Se déconnecter
+            </button>
         </div>
 
         <!-- MAIN APP -->
@@ -1205,6 +1344,12 @@
                             <div class="card-field">
                                 <span class="card-field-label">Unité</span>
                                 <span class="card-field-value" id="cardUnite">-</span>
+                            </div>
+                            <div class="card-field">
+                                <span class="card-field-label">Statut</span>
+                                <span class="card-field-value" id="cardStatus">
+                                    <span class="account-status-badge approved">✅ Approuvé</span>
+                                </span>
                             </div>
                         </div>
                         <div class="card-footer">
@@ -1335,6 +1480,7 @@
                         <div class="profile-avatar" id="profileAvatar">?</div>
                         <div class="profile-name" id="profileName">-</div>
                         <div class="profile-grade" id="profileGrade">-</div>
+                        <div id="profileStatus" style="margin-top:8px;"></div>
                     </div>
 
                     <div class="card">
@@ -1591,10 +1737,9 @@
         let pharmacyMarkers = [];
         let unsubscribeOrdonnances = null;
         let selectedImageFile = null;
-        
-        // ✅ AJOUT : Variables pour notifications arrière-plan
         let bgCheckInterval = null;
         let lastKnownStatuses = {};
+        let patientStatusListener = null;
 
         // ============ UTILITAIRES ============
         function parseDate(ts) {
@@ -1757,55 +1902,57 @@
             notify('🔔 Notification de test envoyée', 'success');
         }
 
-        // ✅ AJOUT : Système de notifications en arrière-plan (polling)
-        function startBackgroundChecks() {
-            document.addEventListener('visibilitychange', () => {
-                const settings = getNotifSettings();
-                if (!settings.background) return;
-                
-                if (document.hidden) {
-                    // App minimisée → polling toutes les 30s
-                    bgCheckInterval = setInterval(checkForUpdates, 30000);
-                } else {
-                    // App au premier plan → arrêter le polling
-                    if (bgCheckInterval) {
-                        clearInterval(bgCheckInterval);
-                        bgCheckInterval = null;
+        // ============ SUIVI DU STATUT DU PATIENT ============
+        function startPatientStatusListener(uid) {
+            if (patientStatusListener) patientStatusListener();
+            
+            patientStatusListener = db.collection('patients').doc(uid).onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    const status = data.approvalStatus || 'pending';
+                    
+                    if (status === 'approved') {
+                        // Compte approuvé - montrer l'application
+                        if (!document.getElementById('mainApp').style.display || document.getElementById('mainApp').style.display === 'none') {
+                            showMainApp();
+                        }
+                    } else if (status === 'rejected') {
+                        // Compte rejeté
+                        if (document.getElementById('mainApp').style.display !== 'none') {
+                            document.getElementById('mainApp').style.display = 'none';
+                        }
+                        showApprovalScreen('rejected', data.rejectionReason);
+                    } else {
+                        // En attente
+                        if (document.getElementById('mainApp').style.display !== 'none') {
+                            document.getElementById('mainApp').style.display = 'none';
+                        }
+                        showApprovalScreen('pending');
                     }
                 }
             });
         }
-        
-        async function checkForUpdates() {
-            if (!currentPatient) return;
-            try {
-                const snapshot = await db.collection('ordonnances')
-                    .where('patientId', '==', currentPatient.id)
-                    .limit(10)
-                    .get();
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const prevStatus = lastKnownStatuses[data.id];
-                    
-                    if (prevStatus && prevStatus !== data.status && data.status !== 'pending') {
-                        let title = '', body = '';
-                        if (data.status === 'validated') {
-                            title = '✅ Ordonnance validée';
-                            body = `Votre demande ${data.id} a été validée.`;
-                        } else if (data.status === 'refused') {
-                            title = '❌ Ordonnance refusée';
-                            body = `Motif: ${data.refusalReason || 'Non spécifié'}`;
-                        } else if (data.status === 'used') {
-                            title = '📦 Ordonnance utilisée';
-                            body = `Votre demande ${data.id} a été utilisée.`;
-                        }
-                        if (title) showNativeNotification(title, body);
-                    }
-                    lastKnownStatuses[data.id] = data.status;
-                });
-            } catch (e) {
-                console.error('BG check:', e);
+
+        function showApprovalScreen(status, reason) {
+            const screen = document.getElementById('approvalPendingScreen');
+            screen.classList.add('active');
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            
+            const badge = document.getElementById('approvalStatusBadge');
+            
+            if (status === 'pending') {
+                badge.className = 'approval-status-badge pending';
+                badge.textContent = '⏳ En attente d\'approbation';
+                document.querySelector('.approval-icon').style.background = 'linear-gradient(135deg, var(--warning), #e0a800)';
+                document.querySelector('.approval-pending-screen h2').textContent = '📋 Compte en attente de validation';
+                document.querySelector('.approval-pending-screen p').textContent = 'Votre compte sera examiné par le service mutuelle.';
+            } else if (status === 'rejected') {
+                badge.className = 'approval-status-badge rejected';
+                badge.textContent = '❌ Compte rejeté';
+                document.querySelector('.approval-icon').style.background = 'linear-gradient(135deg, var(--danger), #c0392b)';
+                document.querySelector('.approval-pending-screen h2').textContent = '❌ Compte non approuvé';
+                document.querySelector('.approval-pending-screen p').textContent = reason || 'Votre demande d\'inscription a été rejetée. Contactez le service mutuelle pour plus d\'informations.';
             }
         }
 
@@ -1852,8 +1999,18 @@
                 if (patientDoc.exists) {
                     currentUser = cred.user;
                     currentPatient = { id: patientDoc.id, ...patientDoc.data() };
-                    notify('✅ Connexion réussie', 'success');
-                    showMainApp();
+                    
+                    // Vérifier le statut d'approbation
+                    const status = currentPatient.approvalStatus || 'pending';
+                    
+                    if (status === 'approved') {
+                        notify('✅ Connexion réussie', 'success');
+                        showMainApp();
+                    } else {
+                        // Compte pas encore approuvé
+                        startPatientStatusListener(cred.user.uid);
+                        showApprovalScreen(status, currentPatient.rejectionReason);
+                    }
                 } else {
                     notify('Profil introuvable', 'error');
                     await auth.signOut();
@@ -1893,14 +2050,21 @@
                     unite: document.getElementById('regUnite').value,
                     corps: document.getElementById('regCorps').value,
                     numeroCarte: document.getElementById('regNumeroCarte').value.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    // ✅ NOUVEAU : Statut d'approbation
+                    approvalStatus: 'pending',
+                    approvalRequestedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
                 await db.collection('patients').doc(cred.user.uid).set(patientData);
                 currentUser = cred.user;
                 currentPatient = { id: cred.user.uid, ...patientData };
-                notify('✅ Inscription réussie', 'success');
-                showMainApp();
+                
+                // ✅ Afficher la page d'attente
+                startPatientStatusListener(cred.user.uid);
+                showApprovalScreen('pending');
+                notify('✅ Inscription réussie ! Votre compte sera examiné par le service mutuelle.', 'success');
+                
             } catch (error) {
                 let msg = 'Erreur';
                 if (error.code === 'auth/email-already-in-use') msg = 'Email déjà utilisé';
@@ -1912,6 +2076,7 @@
 
         function showMainApp() {
             document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('approvalPendingScreen').classList.remove('active');
             document.getElementById('mainApp').style.display = 'flex';
             loadDashboard();
             startOrdonnancesListener();
@@ -1919,7 +2084,7 @@
             getUserLocation();
             requestNotificationPermission();
             loadNotifSettings();
-            startBackgroundChecks(); // ✅ AJOUT : démarrer le polling arrière-plan
+            startBackgroundChecks();
         }
 
         function loadDashboard() {
@@ -1930,20 +2095,43 @@
             document.getElementById('cardCorps').textContent = currentPatient.corps || '-';
             document.getElementById('cardNumero').textContent = `N° ${currentPatient.numeroCarte || 'MSM-NI-2025-000000'}`;
             
+            // ✅ Afficher le statut sur la carte
+            const statusEl = document.getElementById('cardStatus');
+            const status = currentPatient.approvalStatus || 'pending';
+            if (status === 'approved') {
+                statusEl.innerHTML = '<span class="account-status-badge approved">✅ Approuvé</span>';
+            } else if (status === 'pending') {
+                statusEl.innerHTML = '<span class="account-status-badge pending">⏳ En attente</span>';
+            } else {
+                statusEl.innerHTML = '<span class="account-status-badge rejected">❌ Rejeté</span>';
+            }
+            
             document.getElementById('profileName').textContent = `${currentPatient.prenom || ''} ${currentPatient.nom || ''}`.trim();
             document.getElementById('profileGrade').textContent = currentPatient.grade || '';
             document.getElementById('profileAvatar').textContent = (currentPatient.prenom || currentPatient.nom || '?').charAt(0).toUpperCase();
+            
+            // ✅ Statut dans le profil
+            const profileStatus = document.getElementById('profileStatus');
+            if (status === 'approved') {
+                profileStatus.innerHTML = '<span class="account-status-badge approved">✅ Compte approuvé</span>';
+            } else if (status === 'pending') {
+                profileStatus.innerHTML = '<span class="account-status-badge pending">⏳ En attente d\'approbation</span>';
+            } else {
+                profileStatus.innerHTML = '<span class="account-status-badge rejected">❌ Compte rejeté</span>';
+            }
         }
 
         async function logout() {
             if (unsubscribeOrdonnances) unsubscribeOrdonnances();
-            if (bgCheckInterval) clearInterval(bgCheckInterval); // ✅ AJOUT
+            if (bgCheckInterval) clearInterval(bgCheckInterval);
+            if (patientStatusListener) patientStatusListener();
             try { await auth.signOut(); } catch(e) {}
             currentUser = null;
             currentPatient = null;
             myOrdonnances = [];
             document.getElementById('authScreen').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('approvalPendingScreen').classList.remove('active');
         }
 
         // ============ IMAGE UPLOAD ============
@@ -2043,7 +2231,8 @@
                     status: 'pending',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     produits: [],
-                    imageDeleted: false
+                    imageDeleted: false,
+                    corps: currentPatient.corps  // ✅ AJOUT : pour le filtrage par corps
                 });
                 
                 notify('✅ Demande envoyée !', 'success');
@@ -2087,7 +2276,6 @@
                     updateStats();
                     detectChanges(previousOrds, myOrdonnances);
                     
-                    // ✅ AJOUT : Mettre à jour les statuts connus pour le polling
                     myOrdonnances.forEach(o => lastKnownStatuses[o.id] = o.status);
                 });
         }
@@ -2316,7 +2504,7 @@
                     y += 8;
                 }
                 
-                // ✅ AJOUT : QR CODE via api.qrserver.com
+                // QR CODE
                 if (ord.qrData) {
                     try {
                         const qrStr = typeof ord.qrData === 'string' ? ord.qrData : JSON.stringify(ord.qrData);
@@ -2631,6 +2819,56 @@
             window.location.href = `tel:${selectedPharmacy.phone}`;
         }
 
+        // ============ BACKGROUND CHECKS ============
+        function startBackgroundChecks() {
+            document.addEventListener('visibilitychange', () => {
+                const settings = getNotifSettings();
+                if (!settings.background) return;
+                
+                if (document.hidden) {
+                    bgCheckInterval = setInterval(checkForUpdates, 30000);
+                } else {
+                    if (bgCheckInterval) {
+                        clearInterval(bgCheckInterval);
+                        bgCheckInterval = null;
+                    }
+                }
+            });
+        }
+        
+        async function checkForUpdates() {
+            if (!currentPatient) return;
+            try {
+                const snapshot = await db.collection('ordonnances')
+                    .where('patientId', '==', currentPatient.id)
+                    .limit(10)
+                    .get();
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const prevStatus = lastKnownStatuses[data.id];
+                    
+                    if (prevStatus && prevStatus !== data.status && data.status !== 'pending') {
+                        let title = '', body = '';
+                        if (data.status === 'validated') {
+                            title = '✅ Ordonnance validée';
+                            body = `Votre demande ${data.id} a été validée.`;
+                        } else if (data.status === 'refused') {
+                            title = '❌ Ordonnance refusée';
+                            body = `Motif: ${data.refusalReason || 'Non spécifié'}`;
+                        } else if (data.status === 'used') {
+                            title = '📦 Ordonnance utilisée';
+                            body = `Votre demande ${data.id} a été utilisée.`;
+                        }
+                        if (title) showNativeNotification(title, body);
+                    }
+                    lastKnownStatuses[data.id] = data.status;
+                });
+            } catch (e) {
+                console.error('BG check:', e);
+            }
+        }
+
         // ============ AUTO-LOGIN ============
         auth.onAuthStateChanged(async (user) => {
             loadTheme();
@@ -2640,7 +2878,15 @@
                     if (patientDoc.exists) {
                         currentUser = user;
                         currentPatient = { id: patientDoc.id, ...patientDoc.data() };
-                        showMainApp();
+                        
+                        const status = currentPatient.approvalStatus || 'pending';
+                        
+                        if (status === 'approved') {
+                            showMainApp();
+                        } else {
+                            startPatientStatusListener(user.uid);
+                            showApprovalScreen(status, currentPatient.rejectionReason);
+                        }
                     } else {
                         document.getElementById('authScreen').style.display = 'flex';
                         document.getElementById('mainApp').style.display = 'none';
@@ -2652,6 +2898,7 @@
             } else {
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('approvalPendingScreen').classList.remove('active');
             }
         });
     </script>
