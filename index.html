@@ -253,7 +253,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .action-anim { width: 50px; height: 50px; margin: 0 auto 8px; overflow: hidden; }
 .action-anim video { width: 100%; height: 100%; object-fit: contain; }
 
-/* ========= STYLES POUR L'AFFICHAGE DU LIEN DE RÉINITIALISATION ========= */
 .reset-link-box { margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(40,167,69,0.1), rgba(40,167,69,0.05)); border-radius: 15px; border: 2px solid #28a745; text-align: center; animation: fadeIn 0.5s; }
 .reset-link-box .email-icon { font-size: 48px; margin-bottom: 10px; }
 .reset-link-box h3 { color: #155724; margin-bottom: 10px; font-size: 16px; }
@@ -265,6 +264,108 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .reset-link-box .open-email-btn:active { transform: scale(0.95); }
 .reset-link-box .spam-warning { font-size: 11px; color: #856404; margin-top: 10px; background: #fff3cd; padding: 8px; border-radius: 8px; }
 .reset-link-box .resend-btn { display: inline-block; margin-top: 10px; padding: 8px 16px; background: transparent; color: #2c5aa0; border: 1px solid #2c5aa0; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+/* ===== NOUVEAU : ÉCRAN DE RÉCUPÉRATION DE PROFIL ===== */
+.profile-recovery-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+    padding: 30px 20px;
+    text-align: center;
+    overflow-y: auto;
+}
+.profile-recovery-screen.active { display: flex; }
+.recovery-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dc3545, #c0392b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: white;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+}
+.recovery-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #721c24;
+    margin-bottom: 10px;
+}
+.recovery-subtitle {
+    font-size: 14px;
+    color: #842029;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    max-width: 400px;
+}
+.recovery-box {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 400px;
+    text-align: left;
+}
+.recovery-box h4 {
+    font-size: 14px;
+    color: #721c24;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.recovery-info {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #333;
+    word-break: break-all;
+}
+.recovery-info strong { color: #2c5aa0; }
+.recovery-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+}
+.recovery-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s;
+}
+.recovery-btn:active { transform: scale(0.98); }
+.recovery-btn.primary {
+    background: linear-gradient(135deg, #2c5aa0, #3d6ab5);
+    color: white;
+}
+.recovery-btn.success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+.recovery-btn.danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
 </style>
 </head>
 <body>
@@ -373,7 +474,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 <i class="fas fa-user-plus"></i> Créer mon compte
 </button>
 </form>
-<!-- Reset Password Form - VERSION SIMPLIFIÉE -->
 <form id="resetPasswordForm" class="auth-form" style="display:none;">
 <button type="button" class="back-link" onclick="showLoginForm()">
 <i class="fas fa-arrow-left"></i> Retour
@@ -386,11 +486,47 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 <button type="button" class="btn btn-primary" onclick="sendResetCode()" id="sendCodeBtn">
 <i class="fas fa-envelope"></i> Envoyer le lien de réinitialisation
 </button>
-<!-- Zone d'affichage du message après envoi -->
 <div id="resetLinkInfo"></div>
 </form>
 </div>
 </div>
+
+<!-- ===== NOUVEAU : ÉCRAN DE RÉCUPÉRATION DE PROFIL ===== -->
+<div id="profileRecoveryScreen" class="profile-recovery-screen">
+    <div class="recovery-icon">
+        <i class="fas fa-user-slash"></i>
+    </div>
+    <h2 class="recovery-title">⚠️ Profil introuvable</h2>
+    <p class="recovery-subtitle">
+        Votre compte d'authentification existe, mais votre profil MiliSoin n'est pas trouvé dans la base de données.
+    </p>
+    <div class="recovery-box">
+        <h4><i class="fas fa-info-circle"></i> Informations du compte</h4>
+        <div class="recovery-info">
+            <strong>Email :</strong> <span id="recoveryEmail">-</span><br>
+            <strong>UID :</strong> <span id="recoveryUid" style="font-size:10px;">-</span>
+        </div>
+        <h4 style="margin-top:15px;"><i class="fas fa-question-circle"></i> Que souhaitez-vous faire ?</h4>
+        <div class="recovery-actions">
+            <button class="recovery-btn success" onclick="searchProfileByEmail()">
+                <i class="fas fa-search"></i> Rechercher mon profil par email
+            </button>
+            <button class="recovery-btn primary" onclick="searchProfileByMatricule()">
+                <i class="fas fa-id-card"></i> Rechercher par matricule
+            </button>
+            <button class="recovery-btn primary" onclick="createMinimalProfile()">
+                <i class="fas fa-plus-circle"></i> Créer un profil minimal
+            </button>
+            <button class="recovery-btn danger" onclick="deleteAccountAndRestart()">
+                <i class="fas fa-trash-alt"></i> Supprimer le compte et recommencer
+            </button>
+            <button class="recovery-btn danger" onclick="forceLogout()">
+                <i class="fas fa-sign-out-alt"></i> Se déconnecter
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- PAGE D'ATTENTE D'APPROBATION -->
 <div id="approvalPendingScreen" class="approval-pending-screen">
 <div class="bg-decoration d1"></div>
@@ -456,7 +592,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </div>
 </div>
 <div class="main-content">
-<!-- PAGE ACCUEIL - SANS LA SECTION ANIMATIONS NON FONCTIONNELLES -->
 <div class="page active" id="page-home">
 <div class="virtual-card">
 <div class="card-header-info">
@@ -492,7 +627,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 <span class="card-number" id="cardNumero">N° MSM-NI-2025-000000</span>
 </div>
 </div>
-<!-- STATS GRID -->
 <div class="stats-grid">
 <div class="stat-card">
 <div class="stat-value" id="statPending">0</div>
@@ -511,7 +645,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 <div class="stat-label">Total</div>
 </div>
 </div>
-<!-- ACTION GRID - BOUTONS FONCTIONNELS -->
 <div class="action-grid">
 <div class="action-btn" onclick="openSendModal()">
 <div class="action-anim">
@@ -551,7 +684,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </div>
 </div>
 </div>
-<!-- PAGE CARTE -->
 <div class="page" id="page-map">
 <div class="map-container">
 <div id="map"></div>
@@ -597,7 +729,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </div>
 </div>
 </div>
-<!-- PAGE DEMANDES -->
 <div class="page" id="page-orders">
 <div class="card">
 <div class="card-title">
@@ -610,7 +741,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </div>
 </div>
 </div>
-<!-- PAGE PROFIL -->
 <div class="page" id="page-profile">
 <div class="profile-header">
 <div class="profile-avatar" id="profileAvatar">?</div>
@@ -722,7 +852,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </div>
 </div>
 </div>
-<!-- Modal Envoi -->
 <div class="modal" id="sendModal">
 <div class="modal-content">
 <div class="modal-header">
@@ -760,7 +889,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </div>
 </div>
 </div>
-<!-- Modal Détail -->
 <div class="modal" id="detailModal">
 <div class="modal-content">
 <div class="modal-header">
@@ -776,18 +904,15 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </div>
 </div>
 </div>
-<!-- Image Zoom -->
 <div class="image-zoom" id="imageZoom" onclick="this.classList.remove('active')">
 <img id="zoomImage" src="" alt="Zoom">
 </div>
-<!-- Confettis Container -->
 <div class="confetti-container" id="confettiContainer"></div>
 <div class="notification" id="notification"></div>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
-// ============ FIREBASE ============
 const firebaseConfig = {
 apiKey: "AIzaSyCFMq3jwm78PDlS55VP4AcwTIDpH3ZINbI",
 authDomain: "service-mutuel.firebaseapp.com",
@@ -800,7 +925,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ============ UPLOAD VIA VERCEL API ============
 const UPLOAD_API_URL = '/api/upload';
 async function uploadImageViaVercel(file, onProgress) {
 try {
@@ -837,7 +961,6 @@ throw error;
 }
 }
 
-// ============ VARIABLES ============
 let currentUser = null;
 let currentPatient = null;
 let myOrdonnances = [];
@@ -854,7 +977,6 @@ let bgCheckInterval = null;
 let lastKnownStatuses = {};
 let patientStatusListener = null;
 
-// ============ CONFETTIS ============
 function launchConfetti() {
 const container = document.getElementById('confettiContainer');
 const colors = ['#2c5aa0', '#28a745', '#fd7e14', '#dc3545', '#ffc107', '#6f42c1', '#e83e8c', '#20c997'];
@@ -883,13 +1005,13 @@ setTimeout(() => confetti.remove(), (duration + delay) * 1000 + 500);
 }
 }
 
-// ============ AFFICHAGE PAGE APPROBATION ============
 function showApprovalScreen(status, reason) {
 const screen = document.getElementById('approvalPendingScreen');
 screen.classList.remove('pending', 'approved', 'rejected');
 screen.classList.add('active');
 document.getElementById('authScreen').style.display = 'none';
 document.getElementById('mainApp').style.display = 'none';
+document.getElementById('profileRecoveryScreen').classList.remove('active');
 const icon = document.getElementById('approvalMainIcon');
 const title = document.getElementById('approvalTitle');
 const subtitle = document.getElementById('approvalSubtitle');
@@ -938,7 +1060,259 @@ badge.textContent = '❌ Compte rejeté';
 }
 }
 
-// ============ UTILITAIRES ============
+// ===== NOUVELLES FONCTIONS DE RÉCUPÉRATION DE PROFIL =====
+function showProfileRecoveryScreen(user) {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('approvalPendingScreen').classList.remove('active');
+    document.getElementById('profileRecoveryScreen').classList.add('active');
+    
+    document.getElementById('recoveryEmail').textContent = user.email || 'Non disponible';
+    document.getElementById('recoveryUid').textContent = user.uid || 'Non disponible';
+}
+
+async function searchProfileByEmail() {
+    if (!currentUser || !currentUser.email) {
+        notify('❌ Email non disponible', 'error');
+        return;
+    }
+    
+    notify('🔍 Recherche du profil par email...', 'info');
+    
+    try {
+        const snapshot = await db.collection('patients')
+            .where('email', '==', currentUser.email)
+            .limit(1)
+            .get();
+        
+        if (snapshot.empty) {
+            notify('❌ Aucun profil trouvé avec cet email', 'error');
+            return;
+        }
+        
+        const doc = snapshot.docs[0];
+        const profileData = doc.data();
+        
+        if (doc.id !== currentUser.uid) {
+            const confirmLink = confirm(
+                `✅ Profil trouvé !\n\n` +
+                `Nom: ${profileData.prenom || ''} ${profileData.nom || ''}\n` +
+                `Grade: ${profileData.grade || '-'}\n` +
+                `Matricule: ${profileData.matricule || '-'}\n\n` +
+                `Voulez-vous lier ce profil à votre compte actuel ?`
+            );
+            
+            if (confirmLink) {
+                // Copier le profil sous le nouvel UID
+                await db.collection('patients').doc(currentUser.uid).set({
+                    ...profileData,
+                    email: currentUser.email,
+                    previousUid: doc.id,
+                    linkedAt: new Date().toISOString(),
+                    recoveredProfile: true
+                });
+                
+                // Supprimer l'ancien document
+                try {
+                    await db.collection('patients').doc(doc.id).delete();
+                } catch(e) {
+                    console.warn('Impossible de supprimer l\'ancien profil:', e);
+                }
+                
+                currentPatient = { id: currentUser.uid, ...profileData, email: currentUser.email };
+                notify('✅ Profil lié avec succès !', 'success');
+                
+                const status = currentPatient.approvalStatus || 'pending';
+                if (status === 'approved') {
+                    showMainApp();
+                } else {
+                    startPatientStatusListener(currentUser.uid);
+                    showApprovalScreen(status, currentPatient.rejectionReason);
+                }
+            }
+        } else {
+            currentPatient = { id: doc.id, ...profileData };
+            notify('✅ Profil retrouvé !', 'success');
+            
+            const status = currentPatient.approvalStatus || 'pending';
+            if (status === 'approved') {
+                showMainApp();
+            } else {
+                startPatientStatusListener(currentUser.uid);
+                showApprovalScreen(status, currentPatient.rejectionReason);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur recherche:', error);
+        notify('❌ Erreur: ' + error.message, 'error');
+    }
+}
+
+async function searchProfileByMatricule() {
+    const matricule = prompt('Entrez votre matricule militaire (ex: MIL-2025-001) :');
+    if (!matricule || matricule.trim() === '') return;
+    
+    notify('🔍 Recherche en cours...', 'info');
+    
+    try {
+        const snapshot = await db.collection('patients')
+            .where('matricule', '==', matricule.trim())
+            .limit(1)
+            .get();
+        
+        if (snapshot.empty) {
+            notify('❌ Aucun profil trouvé avec ce matricule', 'error');
+            return;
+        }
+        
+        const doc = snapshot.docs[0];
+        const profileData = doc.data();
+        
+        if (doc.id !== currentUser.uid) {
+            const confirmLink = confirm(
+                `✅ Profil trouvé !\n\n` +
+                `Nom: ${profileData.prenom || ''} ${profileData.nom || ''}\n` +
+                `Grade: ${profileData.grade || '-'}\n` +
+                `Email: ${profileData.email || '-'}\n\n` +
+                `Voulez-vous lier ce profil à votre compte actuel ?`
+            );
+            
+            if (confirmLink) {
+                await db.collection('patients').doc(currentUser.uid).set({
+                    ...profileData,
+                    email: currentUser.email,
+                    previousUid: doc.id,
+                    linkedAt: new Date().toISOString(),
+                    recoveredProfile: true
+                });
+                
+                try {
+                    await db.collection('patients').doc(doc.id).delete();
+                } catch(e) {
+                    console.warn('Impossible de supprimer l\'ancien profil:', e);
+                }
+                
+                currentPatient = { id: currentUser.uid, ...profileData, email: currentUser.email };
+                notify('✅ Profil lié avec succès !', 'success');
+                
+                const status = currentPatient.approvalStatus || 'pending';
+                if (status === 'approved') {
+                    showMainApp();
+                } else {
+                    startPatientStatusListener(currentUser.uid);
+                    showApprovalScreen(status, currentPatient.rejectionReason);
+                }
+            }
+        } else {
+            currentPatient = { id: doc.id, ...profileData };
+            notify('✅ Profil retrouvé !', 'success');
+            
+            const status = currentPatient.approvalStatus || 'pending';
+            if (status === 'approved') {
+                showMainApp();
+            } else {
+                startPatientStatusListener(currentUser.uid);
+                showApprovalScreen(status, currentPatient.rejectionReason);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur recherche:', error);
+        notify('❌ Erreur: ' + error.message, 'error');
+    }
+}
+
+async function createMinimalProfile() {
+    if (!currentUser) {
+        notify('❌ Vous devez être connecté', 'error');
+        return;
+    }
+    
+    if (!confirm('Créer un profil minimal ?\n\nVous devrez ensuite contacter l\'administrateur pour compléter vos informations.')) {
+        return;
+    }
+    
+    notify('🔄 Création du profil minimal...', 'info');
+    
+    try {
+        const minimalProfile = {
+            email: currentUser.email,
+            nom: 'UTILISATEUR',
+            prenom: 'À COMPLÉTER',
+            grade: 'Non spécifié',
+            matricule: 'RECUP-' + Date.now(),
+            dateNaissance: '2000-01-01',
+            unite: 'Non spécifiée',
+            corps: 'FAN',
+            numeroCarte: 'MSM-RECUP-' + Date.now(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            approvalStatus: 'pending',
+            approvalRequestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            recoveredFromAuth: true,
+            recoveryDate: new Date().toISOString()
+        };
+        
+        await db.collection('patients').doc(currentUser.uid).set(minimalProfile);
+        currentPatient = { id: currentUser.uid, ...minimalProfile };
+        
+        notify('✅ Profil créé. Contactez l\'administrateur pour compléter vos informations.', 'success');
+        startPatientStatusListener(currentUser.uid);
+        showApprovalScreen('pending');
+    } catch (error) {
+        console.error('Erreur création:', error);
+        notify('❌ Erreur: ' + error.message, 'error');
+    }
+}
+
+async function deleteAccountAndRestart() {
+    if (!confirm('⚠️ Supprimer définitivement votre compte ?\n\nCette action est irréversible !')) return;
+    if (!confirm('🔴 DERNIÈRE CONFIRMATION : Toutes vos données seront perdues. Continuer ?')) return;
+    
+    notify('🗑️ Suppression du compte...', 'info');
+    
+    try {
+        if (currentUser) {
+            try {
+                await db.collection('patients').doc(currentUser.uid).delete();
+            } catch (e) {
+                console.log('Pas de profil à supprimer');
+            }
+            
+            try {
+                await currentUser.delete();
+            } catch (e) {
+                if (e.code === 'auth/requires-recent-login') {
+                    notify('⚠️ Déconnectez-vous puis reconnectez-vous avant de supprimer', 'warning');
+                    return;
+                }
+                throw e;
+            }
+        }
+        
+        notify('✅ Compte supprimé. Vous pouvez vous réinscrire.', 'success');
+        forceLogout();
+    } catch (error) {
+        console.error('Erreur suppression:', error);
+        notify('❌ Erreur: ' + error.message, 'error');
+    }
+}
+
+function forceLogout() {
+    if (unsubscribeOrdonnances) unsubscribeOrdonnances();
+    if (bgCheckInterval) clearInterval(bgCheckInterval);
+    if (patientStatusListener) patientStatusListener();
+    
+    try { auth.signOut(); } catch(e) {}
+    
+    currentUser = null;
+    currentPatient = null;
+    myOrdonnances = [];
+    
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('approvalPendingScreen').classList.remove('active');
+    document.getElementById('profileRecoveryScreen').classList.remove('active');
+}
+
 function parseDate(ts) {
 if (!ts) return null;
 if (ts.toDate && typeof ts.toDate === 'function') return ts.toDate();
@@ -978,7 +1352,6 @@ if (page === 'orders') loadOrders();
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-// ============ RÉINITIALISATION MOT DE PASSE - VERSION SIMPLIFIÉE ============
 function showResetPassword() {
 document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
 document.getElementById('resetPasswordForm').style.display = 'block';
@@ -995,7 +1368,6 @@ document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active')
 document.querySelector('.auth-tab[data-tab="login"]').classList.add('active');
 }
 
-// Fonction pour détecter le fournisseur d'email
 function getEmailProvider(email) {
 const domain = (email.split('@')[1] || '').toLowerCase();
 const providers = {
@@ -1011,7 +1383,6 @@ const providers = {
 return providers[domain] || { name: 'votre boîte mail', url: 'https://mail.google.com/' };
 }
 
-// Envoyer le lien de réinitialisation
 async function sendResetCode() {
 const email = document.getElementById('resetEmail').value.trim();
 if (!email) {
@@ -1024,13 +1395,10 @@ btn.disabled = true;
 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
 
 try {
-// ✅ CORRECTION : Ne pas passer le paramètre 'url' pour éviter l'erreur unauthorized-continue-uri
 await auth.sendPasswordResetEmail(email);
 
-// Récupérer le fournisseur d'email
 const provider = getEmailProvider(email);
 
-// Afficher le message de succès
 const linkInfo = document.getElementById('resetLinkInfo');
 linkInfo.innerHTML = `
 <div class="reset-link-box">
@@ -1133,7 +1501,6 @@ btn.innerHTML = '<i class="fas fa-envelope"></i> Envoyer le lien de réinitialis
 }
 }
 
-// ============ NOTIFICATIONS ============
 function getNotifSettings() {
 const saved = localStorage.getItem('milisoin_notif_settings');
 if (saved) return JSON.parse(saved);
@@ -1230,7 +1597,6 @@ showNativeNotification('MiliSoin - Test', '🔔 Les notifications fonctionnent !
 notify('🔔 Notification de test envoyée', 'success');
 }
 
-// ============ SUIVI DU STATUT DU PATIENT ============
 function startPatientStatusListener(uid) {
 if (patientStatusListener) patientStatusListener();
 patientStatusListener = db.collection('patients').doc(uid).onSnapshot((doc) => {
@@ -1257,7 +1623,6 @@ showApprovalScreen('pending');
 });
 }
 
-// ============ THEME ============
 function setTheme(theme) {
 document.documentElement.setAttribute('data-theme', theme);
 localStorage.setItem('milisoin-theme', theme);
@@ -1275,7 +1640,6 @@ const saved = localStorage.getItem('milisoin-theme') || 'light';
 setTheme(saved);
 }
 
-// ============ AUTH ============
 document.querySelectorAll('.auth-tab').forEach(tab => {
 tab.addEventListener('click', () => {
 document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -1288,6 +1652,8 @@ document.getElementById('registerForm').style.display = 'block';
 }
 });
 });
+
+// ===== CONNEXION CORRIGÉE : Gestion du profil manquant =====
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 try {
@@ -1308,8 +1674,10 @@ startPatientStatusListener(cred.user.uid);
 showApprovalScreen(status, currentPatient.rejectionReason);
 }
 } else {
-notify('Profil introuvable', 'error');
-await auth.signOut();
+    // ✅ NOUVEAU : Afficher l'écran de récupération au lieu de déconnecter
+    currentUser = cred.user;
+    console.warn('⚠️ Profil introuvable pour UID:', cred.user.uid);
+    showProfileRecoveryScreen(cred.user);
 }
 } catch (error) {
 let msg = 'Erreur de connexion';
@@ -1320,6 +1688,7 @@ else msg = error.message;
 notify(msg, 'error');
 }
 });
+
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 const password = document.getElementById('regPassword').value;
@@ -1361,9 +1730,11 @@ else msg = error.message;
 notify(msg, 'error');
 }
 });
+
 function showMainApp() {
 document.getElementById('authScreen').style.display = 'none';
 document.getElementById('approvalPendingScreen').classList.remove('active');
+document.getElementById('profileRecoveryScreen').classList.remove('active');
 document.getElementById('mainApp').style.display = 'flex';
 loadDashboard();
 startOrdonnancesListener();
@@ -1412,9 +1783,9 @@ myOrdonnances = [];
 document.getElementById('authScreen').style.display = 'flex';
 document.getElementById('mainApp').style.display = 'none';
 document.getElementById('approvalPendingScreen').classList.remove('active');
+document.getElementById('profileRecoveryScreen').classList.remove('active');
 }
 
-// ============ IMAGE UPLOAD ============
 const imageInput = document.getElementById('ordonnanceImageInput');
 const imageUploadZone = document.getElementById('imageUploadZone');
 const imagePreviewContainer = document.getElementById('imagePreviewContainer');
@@ -1520,7 +1891,6 @@ document.getElementById('zoomImage').src = url;
 document.getElementById('imageZoom').classList.add('active');
 }
 
-// ============ ORDONNANCES ============
 function startOrdonnancesListener() {
 if (!currentPatient) return;
 if (unsubscribeOrdonnances) unsubscribeOrdonnances();
@@ -1670,7 +2040,6 @@ downloadBtn.style.display = 'none';
 openModal('detailModal');
 }
 
-// ============ PDF AVEC QR CODE ============
 async function downloadPDF(ordId) {
 const ord = myOrdonnances.find(o => o.id === ordId);
 if (!ord) return;
@@ -1795,7 +2164,6 @@ notify('Erreur: ' + error.message, 'error');
 }
 }
 
-// ============ CARTE DES PHARMACIES ============
 async function loadPharmacies() {
 try {
 const snapshot = await db.collection('pharmacies').get();
@@ -2011,7 +2379,6 @@ return;
 window.location.href = `tel:${selectedPharmacy.phone}`;
 }
 
-// ============ BACKGROUND CHECKS ============
 function startBackgroundChecks() {
 document.addEventListener('visibilitychange', () => {
 const settings = getNotifSettings();
@@ -2057,7 +2424,7 @@ console.error('BG check:', e);
 }
 }
 
-// ============ AUTO-LOGIN ============
+// ===== AUTO-LOGIN CORRIGÉ =====
 auth.onAuthStateChanged(async (user) => {
 loadTheme();
 if (user) {
@@ -2074,8 +2441,9 @@ startPatientStatusListener(user.uid);
 showApprovalScreen(status, currentPatient.rejectionReason);
 }
 } else {
-document.getElementById('authScreen').style.display = 'flex';
-document.getElementById('mainApp').style.display = 'none';
+    // ✅ NOUVEAU : Afficher l'écran de récupération au lieu de juste authScreen
+    currentUser = user;
+    showProfileRecoveryScreen(user);
 }
 } catch (error) {
 document.getElementById('authScreen').style.display = 'flex';
@@ -2085,6 +2453,7 @@ document.getElementById('mainApp').style.display = 'none';
 document.getElementById('authScreen').style.display = 'flex';
 document.getElementById('mainApp').style.display = 'none';
 document.getElementById('approvalPendingScreen').classList.remove('active');
+document.getElementById('profileRecoveryScreen').classList.remove('active');
 }
 });
 </script>
