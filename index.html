@@ -915,17 +915,19 @@ animation: spin 1s linear infinite;
 @keyframes spin {
 to { transform: rotate(360deg); }
 }
+/* ========== PAGE D'ATTENTE D'APPROBATION ========== */
 .approval-pending-screen {
 display: none;
 flex-direction: column;
 align-items: center;
-justify-content: center;
+justify-content: flex-start;
 min-height: 100vh;
 background: linear-gradient(135deg, #f5f7fa 0%, #e8edf5 100%);
-padding: 30px;
+padding: 30px 20px;
 text-align: center;
 position: relative;
-overflow: hidden;
+overflow-y: auto;
+overflow-x: hidden;
 }
 .approval-pending-screen.active {
 display: flex;
@@ -961,7 +963,9 @@ left: 10%;
 position: relative;
 z-index: 1;
 max-width: 500px;
+width: 100%;
 animation: fadeInUp 0.8s ease;
+padding-bottom: 30px;
 }
 @keyframes fadeInUp {
 from {
@@ -1113,7 +1117,7 @@ color: white;
 .approval-pending-screen .info-steps {
 display: flex;
 gap: 15px;
-margin: 20px 0 30px 0;
+margin: 20px 0 20px 0;
 justify-content: center;
 flex-wrap: wrap;
 }
@@ -1182,6 +1186,7 @@ color: #856404;
 background: #f8d7da;
 color: #721c24;
 }
+/* ===== BOUTON MOT DE PASSE OUBLIÉ ===== */
 .forgot-password-link {
 display: block;
 text-align: center;
@@ -1246,6 +1251,7 @@ transform: translateY(110vh) rotate(720deg) scale(0.3);
 opacity: 0;
 }
 }
+/* Animations pour les fonctionnalités */
 .anim-container {
 display: flex;
 flex-wrap: wrap;
@@ -1288,6 +1294,174 @@ width: 100%;
 height: 100%;
 object-fit: contain;
 }
+
+/* ========= STYLES POUR LE BOUTON APPRENEZ EN ATTENDANT ========= */
+.learn-btn-pending {
+margin-top: 15px;
+padding: 14px 30px;
+border: none;
+border-radius: 30px;
+background: linear-gradient(135deg, #28a745, #1e7e34);
+color: white;
+font-size: 15px;
+font-weight: 700;
+cursor: pointer;
+display: inline-flex;
+align-items: center;
+gap: 10px;
+transition: all 0.3s;
+box-shadow: 0 6px 20px rgba(40, 167, 69, 0.35);
+animation: pulseLearn 2.5s ease-in-out infinite;
+}
+.learn-btn-pending:active { transform: scale(0.95); }
+@keyframes pulseLearn {
+0%, 100% { box-shadow: 0 6px 20px rgba(40, 167, 69, 0.35); }
+50% { box-shadow: 0 6px 30px rgba(40, 167, 69, 0.6); }
+}
+
+/* ========= STYLES POUR LE MODAL FAQ ========= */
+.faq-modal-content {
+background: var(--bg-card);
+border-radius: 24px 24px 0 0;
+width: 100%;
+max-height: 90vh;
+overflow-y: auto;
+animation: slideUp 0.3s;
+}
+.faq-header {
+background: linear-gradient(135deg, #2c5aa0, #4a7fd4);
+color: white;
+padding: 24px 20px;
+border-radius: 24px 24px 0 0;
+text-align: center;
+position: sticky;
+top: 0;
+z-index: 2;
+}
+.faq-header-icon {
+font-size: 48px;
+margin-bottom: 8px;
+display: block;
+animation: float 3s ease-in-out infinite;
+}
+.faq-header h2 {
+font-size: 20px;
+font-weight: 800;
+margin-bottom: 4px;
+}
+.faq-header p {
+font-size: 12px;
+opacity: 0.9;
+}
+.faq-close-btn {
+position: absolute;
+top: 16px;
+right: 16px;
+background: rgba(255,255,255,0.2);
+border: none;
+color: white;
+width: 36px;
+height: 36px;
+border-radius: 50%;
+font-size: 20px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.faq-body {
+padding: 16px;
+}
+.faq-item {
+background: var(--bg-card);
+border-radius: 14px;
+margin-bottom: 10px;
+box-shadow: var(--shadow);
+overflow: hidden;
+border: 1px solid var(--border-color);
+transition: all 0.3s;
+}
+.faq-item.open {
+border-color: var(--primary);
+box-shadow: 0 4px 16px rgba(44, 90, 160, 0.15);
+}
+.faq-question {
+padding: 14px 16px;
+display: flex;
+align-items: center;
+gap: 12px;
+cursor: pointer;
+transition: background 0.2s;
+}
+.faq-question:active { background: var(--input-bg); }
+.faq-number {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background: linear-gradient(135deg, #2c5aa0, #4a7fd4);
+color: white;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 13px;
+font-weight: 800;
+flex-shrink: 0;
+}
+.faq-question-text {
+flex: 1;
+font-size: 13px;
+font-weight: 600;
+color: var(--text-primary);
+line-height: 1.4;
+}
+.faq-toggle {
+color: var(--primary);
+font-size: 14px;
+transition: transform 0.3s;
+flex-shrink: 0;
+}
+.faq-item.open .faq-toggle { transform: rotate(180deg); }
+.faq-answer {
+max-height: 0;
+overflow: hidden;
+transition: max-height 0.3s ease, padding 0.3s ease;
+background: var(--input-bg);
+}
+.faq-item.open .faq-answer {
+max-height: 300px;
+padding: 14px 16px 14px 60px;
+}
+.faq-answer-text {
+font-size: 13px;
+color: var(--text-secondary);
+line-height: 1.6;
+}
+.faq-footer {
+padding: 16px 20px;
+text-align: center;
+border-top: 1px solid var(--border-color);
+background: var(--bg-card);
+}
+.faq-footer-text {
+font-size: 12px;
+color: var(--text-secondary);
+margin-bottom: 8px;
+}
+.faq-footer-text strong { color: var(--primary); }
+.faq-support-btn {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+padding: 10px 20px;
+background: var(--primary);
+color: white;
+border: none;
+border-radius: 20px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+}
+
 /* ========= STYLES POUR L'AFFICHAGE DU LIEN DE RÉINITIALISATION ========= */
 .reset-link-box {
 margin-top: 20px;
@@ -1298,74 +1472,16 @@ border: 2px solid #28a745;
 text-align: center;
 animation: fadeIn 0.5s;
 }
-.reset-link-box .email-icon {
-font-size: 48px;
-margin-bottom: 10px;
-}
-.reset-link-box h3 {
-color: #155724;
-margin-bottom: 10px;
-font-size: 16px;
-}
-.reset-link-box .email-address {
-color: #2c5aa0;
-font-weight: 700;
-font-size: 14px;
-word-break: break-all;
-}
-.reset-link-box .instructions {
-background: white;
-padding: 15px;
-border-radius: 10px;
-margin: 15px 0;
-border: 1px dashed #28a745;
-text-align: left;
-}
-.reset-link-box .instructions ol {
-padding-left: 20px;
-margin: 0;
-font-size: 12px;
-color: #333;
-}
-.reset-link-box .instructions ol li {
-margin-bottom: 5px;
-}
-.reset-link-box .open-email-btn {
-display: inline-block;
-padding: 12px 24px;
-background: linear-gradient(135deg, #2c5aa0, #3d6ab5);
-color: white;
-text-decoration: none;
-border-radius: 10px;
-font-weight: 700;
-font-size: 13px;
-margin: 10px 0;
-box-shadow: 0 4px 12px rgba(44,90,160,0.3);
-transition: transform 0.2s;
-}
-.reset-link-box .open-email-btn:active {
-transform: scale(0.95);
-}
-.reset-link-box .spam-warning {
-font-size: 11px;
-color: #856404;
-margin-top: 10px;
-background: #fff3cd;
-padding: 8px;
-border-radius: 8px;
-}
-.reset-link-box .resend-btn {
-display: inline-block;
-margin-top: 10px;
-padding: 8px 16px;
-background: transparent;
-color: #2c5aa0;
-border: 1px solid #2c5aa0;
-border-radius: 8px;
-font-size: 12px;
-font-weight: 600;
-cursor: pointer;
-}
+.reset-link-box .email-icon { font-size: 48px; margin-bottom: 10px; }
+.reset-link-box h3 { color: #155724; margin-bottom: 10px; font-size: 16px; }
+.reset-link-box .email-address { color: #2c5aa0; font-weight: 700; font-size: 14px; word-break: break-all; }
+.reset-link-box .instructions { background: white; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px dashed #28a745; text-align: left; }
+.reset-link-box .instructions ol { padding-left: 20px; margin: 0; font-size: 12px; color: #333; }
+.reset-link-box .instructions ol li { margin-bottom: 5px; }
+.reset-link-box .open-email-btn { display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #2c5aa0, #3d6ab5); color: white; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 13px; margin: 10px 0; box-shadow: 0 4px 12px rgba(44,90,160,0.3); transition: transform 0.2s; }
+.reset-link-box .open-email-btn:active { transform: scale(0.95); }
+.reset-link-box .spam-warning { font-size: 11px; color: #856404; margin-top: 10px; background: #fff3cd; padding: 8px; border-radius: 8px; }
+.reset-link-box .resend-btn { display: inline-block; margin-top: 10px; padding: 8px 16px; background: transparent; color: #2c5aa0; border: 1px solid #2c5aa0; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -1474,7 +1590,7 @@ cursor: pointer;
 <i class="fas fa-user-plus"></i> Créer mon compte
 </button>
 </form>
-<!-- Reset Password Form - VERSION AMÉLIORÉE AVEC LIEN VISIBLE -->
+<!-- Reset Password Form - VERSION AVEC LIEN AFFICHÉ DANS LA PAGE -->
 <form id="resetPasswordForm" class="auth-form" style="display:none;">
 <button type="button" class="back-link" onclick="showLoginForm()">
 <i class="fas fa-arrow-left"></i> Retour
@@ -1538,6 +1654,10 @@ cursor: pointer;
 <div class="step-text">Validation</div>
 </div>
 </div>
+<!-- BOUTON APPRENEZ EN ATTENDANT -->
+<button class="learn-btn-pending" onclick="openFaqModal()">
+<i class="fas fa-graduation-cap"></i> 📚 Apprenez en attendant
+</button>
 <button class="logout-btn-pending" onclick="logout()">
 <i class="fas fa-sign-out-alt"></i> Se déconnecter
 </button>
@@ -1827,6 +1947,29 @@ cursor: pointer;
 </div>
 </div>
 </div>
+<!-- Modal FAQ -->
+<div class="modal" id="faqModal">
+<div class="faq-modal-content">
+<div class="faq-header">
+<button class="faq-close-btn" onclick="closeFaqModal()">&times;</button>
+<span class="faq-header-icon">💡</span>
+<h2>Guide utilisateur MiliSoin</h2>
+<p>15 conseils pour bien utiliser l'application</p>
+</div>
+<div class="faq-body" id="faqBody">
+<!-- Injecté par JavaScript -->
+</div>
+<div class="faq-footer">
+<div class="faq-footer-text">
+Besoin d'aide supplémentaire ?<br>
+<strong>Contactez le support technique</strong>
+</div>
+<button class="faq-support-btn" onclick="contactSupport()">
+<i class="fas fa-headset"></i> Contacter le support
+</button>
+</div>
+</div>
+</div>
 <!-- Modal Envoi -->
 <div class="modal" id="sendModal">
 <div class="modal-content">
@@ -1958,6 +2101,27 @@ let selectedImageFile = null;
 let bgCheckInterval = null;
 let lastKnownStatuses = {};
 let patientStatusListener = null;
+let lastResetAttempt = 0;
+const RESET_COOLDOWN = 60000;
+
+// ============ FAQ DATA - 15 QUESTIONS ============
+const faqData = [
+{ icon: '👋', title: 'Bienvenue sur MiliSoin !', answer: 'Connectez-vous pour accéder à tous les services de la mutuelle militaire du Niger. Votre carte virtuelle, vos demandes d\'ordonnances et les pharmacies partenaires sont à portée de main.' },
+{ icon: '👤', title: 'Vérifiez votre profil', answer: 'Assurez-vous que toutes les informations de votre profil (grade, unité, matricule, corps) sont à jour et correctes. Cela accélère le traitement de vos demandes.' },
+{ icon: '📸', title: 'Photo d\'ordonnance nette', answer: 'Prenez une photo nette et bien éclairée de votre ordonnance avant de l\'envoyer. Évitez les flous, les ombres et les reflets pour un traitement rapide.' },
+{ icon: '📶', title: 'Connexion Internet stable', answer: 'Assurez-vous d\'avoir une connexion Internet stable avant de soumettre une demande. Une coupure pendant l\'envoi peut corrompre l\'image.' },
+{ icon: '📋', title: 'Suivez vos demandes', answer: 'Consultez régulièrement l\'état de vos demandes depuis l\'onglet "Mes demandes". Vous verrez si elles sont en attente, validées ou refusées.' },
+{ icon: '📍', title: 'Activez la localisation', answer: 'Activez votre localisation GPS pour trouver rapidement les pharmacies partenaires à proximité. L\'application calcule automatiquement l\'itinéraire le plus court.' },
+{ icon: '📄', title: 'Téléchargez le PDF', answer: 'Téléchargez votre PDF uniquement lorsque votre demande est validée. Ce document officiel contient le QR code à présenter en pharmacie.' },
+{ icon: '💳', title: 'Carte virtuelle MiliSoin', answer: 'Présentez votre carte virtuelle MiliSoin lors de vos visites en pharmacie. Elle contient toutes vos informations d\'affiliation à la mutuelle.' },
+{ icon: '🔍', title: 'Ordonnances lisibles', answer: 'N\'envoyez que des ordonnances lisibles pour éviter tout retard de traitement. Si l\'image est floue, elle sera refusée et vous devrez la renvoyer.' },
+{ icon: '🔔', title: 'Activez les notifications', answer: 'Activez les notifications afin d\'être informé dès qu\'une demande est traitée. Vous recevrez une alerte avec le son et la vibration.' },
+{ icon: '🔒', title: 'Sécurité du mot de passe', answer: 'Ne partagez jamais votre mot de passe avec une autre personne. Votre compte est personnel et contient des informations médicales sensibles.' },
+{ icon: '✅', title: 'Vérifiez avant d\'envoyer', answer: 'Vérifiez les informations affichées avant de confirmer l\'envoi d\'une demande. Une fois envoyée, une demande ne peut plus être modifiée.' },
+{ icon: '🌙', title: 'Mode sombre', answer: 'Utilisez le mode sombre pour un meilleur confort visuel, surtout la nuit. Activez-le depuis le bouton lune en haut à droite ou depuis votre profil.' },
+{ icon: '🆘', title: 'En cas de problème', answer: 'En cas de problème, consultez ce guide FAQ ou contactez le support technique via le bouton en bas de cette page. Nous sommes là pour vous aider.' },
+{ icon: '🙏', title: 'Merci d\'utiliser MiliSoin', answer: 'Merci d\'utiliser MiliSoin pour faciliter la prise en charge de vos soins de santé. Votre santé est notre priorité !' }
+];
 
 // ============ CONFETTIS ============
 function launchConfetti() {
@@ -1986,6 +2150,43 @@ transform: rotate(${Math.random() * 360}deg);
 container.appendChild(confetti);
 setTimeout(() => confetti.remove(), (duration + delay) * 1000 + 500);
 }
+}
+
+// ============ FAQ MODAL ============
+function openFaqModal() {
+const faqBody = document.getElementById('faqBody');
+faqBody.innerHTML = faqData.map((item, index) => `
+<div class="faq-item" data-index="${index}">
+<div class="faq-question" onclick="toggleFaq(${index})">
+<div class="faq-number">${index + 1}</div>
+<div class="faq-question-text">
+<span style="margin-right:6px;">${item.icon}</span>
+${item.title}
+</div>
+<i class="fas fa-chevron-down faq-toggle"></i>
+</div>
+<div class="faq-answer">
+<div class="faq-answer-text">${item.answer}</div>
+</div>
+</div>
+`).join('');
+document.getElementById('faqModal').classList.add('active');
+}
+
+function closeFaqModal() {
+document.getElementById('faqModal').classList.remove('active');
+}
+
+function toggleFaq(index) {
+const item = document.querySelector(`.faq-item[data-index="${index}"]`);
+if (item) {
+item.classList.toggle('open');
+}
+}
+
+function contactSupport() {
+closeFaqModal();
+notify('📞 Support : support@milisoin.ne', 'info');
 }
 
 // ============ AFFICHAGE PAGE APPROBATION ============
@@ -2120,6 +2321,15 @@ return providers[domain] || { name: 'votre boîte mail', url: 'https://mail.goog
 
 // Envoyer le lien de réinitialisation et l'afficher dans la page
 async function sendResetCode() {
+// Cooldown de 60 secondes entre chaque tentative
+const now = Date.now();
+if (now - lastResetAttempt < RESET_COOLDOWN) {
+const waitTime = Math.ceil((RESET_COOLDOWN - (now - lastResetAttempt)) / 1000);
+notify(`⏳ Veuillez attendre ${waitTime}s avant de réessayer`, 'warning');
+return;
+}
+lastResetAttempt = now;
+
 const email = document.getElementById('resetEmail').value.trim();
 if (!email) {
 notify('Veuillez entrer votre adresse email', 'warning');
@@ -2181,8 +2391,41 @@ notify('✅ Lien de réinitialisation envoyé !', 'success');
 console.error('Erreur Firebase:', error);
 const linkInfo = document.getElementById('resetLinkInfo');
 
-if (error.code === 'auth/invalid-email') {
+if (error.code === 'auth/too-many-requests') {
+notify('⚠️ Trop de tentatives. Veuillez attendre 1 heure.', 'warning');
+linkInfo.innerHTML = `
+<div class="reset-link-box" style="background:linear-gradient(135deg, rgba(255,193,7,0.1), rgba(255,193,7,0.05)); border-color:#ffc107;">
+<div class="email-icon">⏳</div>
+<h3 style="color:#856404;">Trop de tentatives détectées</h3>
+<p style="font-size:13px; color:#856404; margin-bottom:15px;">
+Firebase a temporairement bloqué les requêtes depuis cet appareil pour des raisons de sécurité.
+</p>
+
+<div style="background:white; padding:15px; border-radius:10px; margin:15px 0; border:1px dashed #ffc107;">
+<p style="font-size:12px; color:#666; margin-bottom:10px; font-weight:600;">💡 Solutions :</p>
+<ol style="text-align:left; font-size:12px; color:#333; padding-left:20px; margin:0;">
+<li style="margin-bottom:8px;"><strong>Attendre 1 heure</strong> sans faire de nouvelles tentatives</li>
+<li style="margin-bottom:8px;"><strong>Utiliser un autre appareil</strong> (téléphone, tablette, ordinateur)</li>
+<li style="margin-bottom:8px;"><strong>Changer de réseau</strong> (WiFi → données mobiles ou inversement)</li>
+<li><strong>Contacter le support</strong> si le problème persiste</li>
+</ol>
+</div>
+
+<div style="background:#fff3cd; padding:12px; border-radius:8px; margin-top:15px;">
+<p style="font-size:11px; color:#856404; margin:0;">
+<i class="fas fa-info-circle"></i> <strong>Conseil :</strong> Évitez de cliquer plusieurs fois sur le bouton d'envoi.
+</p>
+</div>
+
+<button type="button" class="resend-btn" style="color:#856404; border-color:#856404; margin-top:15px;" onclick="showLoginForm()">
+<i class="fas fa-arrow-left"></i> Retour à la connexion
+</button>
+</div>
+`;
+
+} else if (error.code === 'auth/invalid-email') {
 notify('❌ Adresse email invalide.', 'error');
+
 } else if (error.code === 'auth/user-not-found') {
 notify('❌ Aucun compte trouvé avec cet email.', 'error');
 linkInfo.innerHTML = `
@@ -2197,8 +2440,7 @@ L'adresse <strong>${email}</strong> n'est associée à aucun compte MiliSoin.
 </button>
 </div>
 `;
-} else if (error.code === 'auth/too-many-requests') {
-notify('⚠️ Trop de tentatives. Réessayez plus tard.', 'warning');
+
 } else {
 notify('❌ ' + (error.message || 'Erreur lors de l\'envoi'), 'error');
 linkInfo.innerHTML = `
@@ -2403,6 +2645,7 @@ await auth.signOut();
 let msg = 'Erreur de connexion';
 if (error.code === 'auth/user-not-found') msg = 'Utilisateur non trouvé';
 else if (error.code === 'auth/wrong-password') msg = 'Mot de passe incorrect';
+else if (error.code === 'auth/too-many-requests') msg = 'Trop de tentatives. Attendez 1 heure.';
 else msg = error.message;
 notify(msg, 'error');
 }
