@@ -7,13 +7,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <!-- CSP corrigée pour autoriser Firebase, CDN et les médias -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://*.firebaseio.com https://*.googleapis.com https://www.gstatic.com https://*.firebaseapp.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://router.project-osrm.org https://unpkg.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.googleapis.com https://*.firebaseapp.com https://f005.backblazeb2.com https://*.gstatic.com; font-src 'self' https://cdnjs.cloudflare.com https://*.gstatic.com; media-src 'self' https://cdnl.iconscout.com https://*.googleapis.com; worker-src 'self' blob:;">
-    <title>MiliSoin - Mutuelle Militaire du Niger</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <title>MiliSoin - Patient</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js">
+    </script>
     <style>
         * {
             margin: 0;
@@ -1893,6 +1893,53 @@
         .contact-btn i {
             font-size: 16px;
         }
+
+        /* Styles pour l'aperçu PDF */
+        .pdf-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+            color: #333;
+        }
+        .pdf-preview-header {
+            background: linear-gradient(135deg, #2c5aa0, #1e3a6f);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: -30px -30px 20px -30px;
+            border-radius: 8px 8px 0 0;
+        }
+        .pdf-preview-header h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        .pdf-section {
+            margin-bottom: 20px;
+        }
+        .pdf-section h4 {
+            color: #2c5aa0;
+            border-bottom: 2px solid #2c5aa0;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        .pdf-table th {
+            background: #2c5aa0;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+        .pdf-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
     </style>
 </head>
 <body>
@@ -2548,7 +2595,6 @@
     <div class="confetti-container" id="confettiContainer"></div>
     <div class="notification" id="notification"></div>
 
-    <!-- Firebase SDK - Chargement sécurisé -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js">
@@ -2572,51 +2618,6 @@
         const db = firebase.firestore();
 
         // ================================================================
-        // RÈGLES DE SÉCURITÉ FIRESTORE OBLIGATOIRES
-        // À COPIER DANS LA CONSOLE FIREBASE (Firestore Rules)
-        // ================================================================
-        /*
-        rules_version = '2';
-        service cloud.firestore {
-          match /databases/{database}/documents {
-            // Fonction utilitaire pour vérifier si l'utilisateur est approuvé
-            function isApprovedPatient() {
-              return request.auth != null &&
-                exists(/databases/$(database)/documents/patients/$(request.auth.uid)) &&
-                get(/databases/$(database)/documents/patients/$(request.auth.uid)).data.approvalStatus == 'approved';
-            }
-
-            // Patients : seul l'utilisateur peut lire/modifier son propre profil
-            // Interdiction de modifier le statut d'approbation
-            match /patients/{patientId} {
-              allow read: if request.auth != null && request.auth.uid == patientId;
-              allow create: if request.auth != null && request.auth.uid == patientId;
-              allow update: if request.auth != null && request.auth.uid == patientId 
-                && request.resource.data.approvalStatus == resource.data.approvalStatus;
-              allow delete: if false;
-            }
-
-            // Ordonnances : l'utilisateur ne peut voir que ses propres ordonnances
-            match /ordonnances/{ordonnanceId} {
-              allow read: if request.auth != null && isApprovedPatient() && resource.data.patientId == request.auth.uid;
-              allow create: if request.auth != null && isApprovedPatient() && request.resource.data.patientId == request.auth.uid;
-              allow update: if request.auth != null && isApprovedPatient() && resource.data.patientId == request.auth.uid;
-              allow delete: if false;
-            }
-
-            // Pharmacies : lecture publique, écriture réservée aux admins
-            match /pharmacies/{pharmacyId} {
-              allow read: if request.auth != null;
-              allow write: if request.auth != null && request.auth.token.admin == true;
-            }
-          }
-        }
-        */
-        // ================================================================
-        // FIN DES RÈGLES DE SÉCURITÉ
-        // ================================================================
-
-        // ================================================================
         // ÉCHAPPEMENT HTML POUR PRÉVENIR LES XSS
         // ================================================================
         function escapeHtml(text) {
@@ -2626,7 +2627,6 @@
             return div.innerHTML;
         }
 
-        // Fonction sécurisée pour afficher du texte
         function safeSetTextContent(elementId, text, defaultValue = '-') {
             const el = document.getElementById(elementId);
             if (el) {
@@ -2634,7 +2634,6 @@
             }
         }
 
-        // Fonction sécurisée pour insérer du HTML connu
         function safeSetInnerHTML(elementId, html) {
             const el = document.getElementById(elementId);
             if (el) {
@@ -3070,7 +3069,6 @@
         // APPLICATION PRINCIPALE
         // ================================================================
         function showMainApp() {
-            // Vérification renforcée contre le contournement
             if (!currentPatient || currentPatient.approvalStatus !== 'approved') {
                 console.warn('⛔ Tentative de contournement détectée !');
                 notify('⛔ Accès non autorisé', 'error');
@@ -3168,7 +3166,7 @@
         }
 
         // ================================================================
-        // GESTION DES IMAGES
+        // GESTION DES IMAGES ET DEMANDES
         // ================================================================
         const imageInput = document.getElementById('ordonnanceImageInput');
         const imageUploadZone = document.getElementById('imageUploadZone');
@@ -3232,6 +3230,39 @@
             openModal('sendModal');
         }
 
+        const UPLOAD_API_URL = '/api/upload';
+
+        async function uploadImageViaVercel(file, onProgress) {
+            try {
+                if (onProgress) onProgress(10);
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                if (onProgress) onProgress(30);
+                const timestamp = Date.now();
+                const fileName = `ordonnances/patient_${currentPatient.id}_${timestamp}_${file.name}`;
+                const response = await fetch(UPLOAD_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file: base64, fileName: fileName, mimeType: file.type || 'image/jpeg' })
+                });
+                if (onProgress) onProgress(80);
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Upload échoué');
+                }
+                const result = await response.json();
+                if (onProgress) onProgress(100);
+                return result.url;
+            } catch (error) {
+                console.error('Erreur upload:', error);
+                throw error;
+            }
+        }
+
         async function submitNewRequest() {
             if (!selectedImageFile) {
                 notify('⚠️ Veuillez ajouter une image', 'warning');
@@ -3246,7 +3277,6 @@
             progressDiv.classList.add('show');
 
             try {
-                // Upload de l'image via l'API Vercel
                 const imageUrl = await uploadImageViaVercel(selectedImageFile, (percent) => {
                     progressFill.style.width = percent + '%';
                     progressPercent.textContent = percent + '%';
@@ -3280,40 +3310,9 @@
             }
         }
 
-        // ================================================================
-        // UPLOAD IMAGE VIA VERCEL
-        // ================================================================
-        const UPLOAD_API_URL = '/api/upload';
-
-        async function uploadImageViaVercel(file, onProgress) {
-            try {
-                if (onProgress) onProgress(10);
-                const base64 = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-                if (onProgress) onProgress(30);
-                const timestamp = Date.now();
-                const fileName = `ordonnances/patient_${currentPatient.id}_${timestamp}_${file.name}`;
-                const response = await fetch(UPLOAD_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ file: base64, fileName: fileName, mimeType: file.type || 'image/jpeg' })
-                });
-                if (onProgress) onProgress(80);
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Upload échoué');
-                }
-                const result = await response.json();
-                if (onProgress) onProgress(100);
-                return result.url;
-            } catch (error) {
-                console.error('Erreur upload:', error);
-                throw error;
-            }
+        function zoomImage(url) {
+            document.getElementById('zoomImage').src = url;
+            document.getElementById('imageZoom').classList.add('active');
         }
 
         // ================================================================
@@ -3383,19 +3382,45 @@
             };
             container.innerHTML = myOrdonnances.map(o => {
                 const status = statusLabels[o.status] || statusLabels.pending;
+                const safeId = escapeHtml(o.id);
+                const safeImageUrl = escapeHtml(o.imageUrl);
+                const safeDate = formatDate(o.createdAt);
+                const safeRefusalReason = o.refusalReason ? escapeHtml(o.refusalReason) : '';
+                const safeCoverage = o.coverage ? formatCurrency(o.coverage) : '';
+                const safeCoveragePercent = o.coveragePercent || 80;
+
+                let produitsHtml = '';
+                if (o.produits && o.produits.length > 0) {
+                    produitsHtml = o.produits.map(p => `
+                        <div style="padding:6px 0; border-bottom:1px solid var(--border-color); font-size:12px;">
+                            <strong>${escapeHtml(p.name)}</strong> - ${escapeHtml(p.dosage || '-')}
+                            <span style="float:right; font-size:11px; color:${p.delivered ? 'var(--success)' : 'var(--warning)'};">
+                                ${p.delivered ? '✅ Délivré' : '⏳ En attente'}
+                            </span>
+                        </div>
+                    `).join('');
+                }
+
                 return `
                     <div class="ord-item ${escapeHtml(o.status)}">
                         <div class="ord-header">
-                            <span class="ord-id">${escapeHtml(o.id)}</span>
+                            <span class="ord-id">${safeId}</span>
                             <span class="status-badge ${status.class}">${status.label}</span>
                         </div>
-                        ${o.imageUrl ? `<img src="${escapeHtml(o.imageUrl)}" class="ord-image-thumb" onclick="zoomImage('${escapeHtml(o.imageUrl)}')" alt="Ordonnance">` : ''}
-                        <div class="ord-info"><strong>Date:</strong> ${formatDate(o.createdAt)}</div>
-                        ${o.coverage ? `<div class="ord-info"><strong>Couverture:</strong> ${formatCurrency(o.coverage)} (${o.coveragePercent || 80}%)</div>` : ''}
-                        ${o.refusalReason ? `<div class="ord-info" style="color:var(--danger);"><strong>Motif:</strong> ${escapeHtml(o.refusalReason)}</div>` : ''}
+                        ${o.imageUrl ? `<img src="${safeImageUrl}" class="ord-image-thumb" onclick="zoomImage('${safeImageUrl}')" alt="Ordonnance">` : ''}
+                        <div class="ord-info"><strong>Date:</strong> ${safeDate}</div>
+                        ${o.coverage ? `<div class="ord-info"><strong>Couverture:</strong> ${safeCoverage} (${safeCoveragePercent}%)</div>` : ''}
+                        ${o.refusalReason ? `<div class="ord-info" style="color:var(--danger);"><strong>Motif:</strong> ${safeRefusalReason}</div>` : ''}
+                        ${produitsHtml ? `<div class="ord-info" style="margin-top:8px;"><strong>Produits:</strong></div>${produitsHtml}` : ''}
                         <div class="ord-actions">
-                            <button class="ord-btn primary" onclick="showOrderDetail('${escapeHtml(o.id)}')"><i class="fas fa-eye"></i> Détails</button>
-                            ${(o.status === 'validated' || o.status === 'used') ? `<button class="ord-btn success" onclick="downloadPDF('${escapeHtml(o.id)}')"><i class="fas fa-download"></i> PDF</button>` : ''}
+                            <button class="ord-btn primary" onclick="showOrderDetail('${safeId}')">
+                                <i class="fas fa-eye"></i> Détails
+                            </button>
+                            ${(o.status === 'validated' || o.status === 'used') ? `
+                            <button class="ord-btn success" onclick="downloadPDF('${safeId}')">
+                                <i class="fas fa-download"></i> PDF
+                            </button>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -3412,23 +3437,27 @@
                 used: { label: 'Utilisée', class: 'status-used' }
             };
             const status = statusLabels[ord.status] || statusLabels.pending;
+            const safeId = escapeHtml(ord.id);
+            const safeDate = formatDate(ord.createdAt);
+            const safeCoveragePercent = ord.coveragePercent || 80;
+            const safeRefusalReason = ord.refusalReason ? escapeHtml(ord.refusalReason) : '';
 
             let content = `
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <strong style="color:var(--primary);">${escapeHtml(ord.id)}</strong>
+                        <strong style="color:var(--primary);">${safeId}</strong>
                         <span class="status-badge ${status.class}">${status.label}</span>
                     </div>
-                    <div class="ord-info"><strong>Date:</strong> ${formatDate(ord.createdAt)}</div>
-                    <div class="ord-info"><strong>Couverture:</strong> ${ord.coveragePercent || 80}%</div>
+                    <div class="ord-info"><strong>Date:</strong> ${safeDate}</div>
+                    <div class="ord-info"><strong>Couverture:</strong> ${safeCoveragePercent}%</div>
                 </div>
                 ${ord.imageUrl ? `
                 <div class="card">
                     <div class="card-title"><i class="fas fa-image"></i> Ordonnance</div>
                     <img src="${escapeHtml(ord.imageUrl)}" class="ord-image-thumb" onclick="zoomImage('${escapeHtml(ord.imageUrl)}')" style="max-height:300px;" alt="Ordonnance">
-                </div>` : ''}
+                </div>
+                ` : ''}
             `;
-
             if (ord.produits && ord.produits.length > 0) {
                 const produitsHtml = ord.produits.map(p => `
                     <div style="padding:10px; background:var(--input-bg); border-radius:8px; margin-bottom:6px;">
@@ -3437,6 +3466,7 @@
                         <span style="float:right; font-size:11px; font-weight:600; color:${p.delivered ? 'var(--success)' : 'var(--warning)'};">
                             ${p.delivered ? '✅ Délivré' : '⏳ En attente'}
                         </span>
+                        ${p.price ? `<div style="font-size:11px; color:var(--text-secondary);">💰 Prix unitaire: ${formatCurrency(p.price)}</div>` : ''}
                     </div>
                 `).join('');
                 content += `
@@ -3444,24 +3474,27 @@
                         <div class="card-title"><i class="fas fa-pills"></i> Médicaments</div>
                         ${produitsHtml}
                     </div>
+                    ${ord.coverage ? `
                     <div class="card" style="background:var(--input-bg); border-left:4px solid var(--primary);">
                         <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                            <span>Couverture (${ord.coveragePercent || 80}%):</span>
+                            <span>Couverture (${safeCoveragePercent}%):</span>
                             <strong>${formatCurrency(ord.coverage)}</strong>
                         </div>
-                    </div>
+                        ${ord.reste ? `<div style="display:flex; justify-content:space-between; margin-top:8px; border-top:1px solid var(--border-color); padding-top:8px;">
+                            <span style="font-weight:700; color:var(--danger);">💰 À encaisser :</span>
+                            <strong style="color:var(--danger);">${formatCurrency(ord.reste)}</strong>
+                        </div>` : ''}
+                    </div>` : ''}
                 `;
             }
-
             if (ord.refusalReason) {
                 content += `
                     <div class="card" style="background:#f8d7da; border-left:4px solid var(--danger);">
                         <div class="card-title" style="color:var(--danger);"><i class="fas fa-times-circle"></i> Motif du refus</div>
-                        <p style="font-size:13px;">${escapeHtml(ord.refusalReason)}</p>
+                        <p style="font-size:13px;">${safeRefusalReason}</p>
                     </div>
                 `;
             }
-
             safeSetInnerHTML('detailContent', content);
             const downloadBtn = document.getElementById('downloadPdfBtn');
             if (ord.status === 'validated' || ord.status === 'used') {
@@ -3473,106 +3506,208 @@
             openModal('detailModal');
         }
 
+        // ================================================================
+        // TÉLÉCHARGEMENT PDF CORRIGÉ AVEC QR CODE
+        // ================================================================
         async function downloadPDF(ordId) {
             const ord = myOrdonnances.find(o => o.id === ordId);
-            if (!ord) return;
+            if (!ord) {
+                notify('❌ Ordonnance non trouvée', 'error');
+                return;
+            }
+
             notify('🔄 Génération PDF...', 'info');
+
             try {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
+                const doc = new jsPDF('p', 'mm', 'a4');
                 const patient = currentPatient;
+
+                // En-tête
                 doc.setFillColor(44, 90, 160);
                 doc.rect(0, 0, 210, 35, 'F');
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(22);
+                doc.setFontSize(20);
                 doc.setFont('helvetica', 'bold');
                 doc.text('MiliSoin - Mutuelle Militaire Niger', 105, 15, { align: 'center' });
-                doc.setFontSize(12);
+                doc.setFontSize(11);
                 doc.setFont('helvetica', 'normal');
                 doc.text('Ordonnance Médicale Validée', 105, 25, { align: 'center' });
+
                 doc.setTextColor(60, 60, 60);
                 doc.setFontSize(9);
+
                 let y = 45;
+
+                // Informations de l'ordonnance
+                doc.setFont('helvetica', 'bold');
                 doc.text(`ID: ${ord.id}`, 14, y);
                 y += 6;
-                doc.text(`Date: ${formatDate(ord.createdAt)}`, 14, y);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Date de validation: ${formatDate(ord.validatedAt || ord.createdAt)}`, 14, y);
                 y += 6;
                 doc.text(`Couverture: ${ord.coveragePercent || 80}%`, 14, y);
                 y += 12;
+
+                // Informations du patient
                 doc.setFillColor(100, 150, 200);
                 doc.rect(14, y - 5, 182, 35, 'F');
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(12);
+                doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
                 doc.text('PATIENT', 18, y);
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Nom: ${patient.prenom} ${patient.nom}`, 18, y + 8);
-                doc.text(`Matricule: ${patient.matricule}`, 110, y + 8);
-                doc.text(`Grade: ${patient.grade}`, 18, y + 14);
-                doc.text(`Unité: ${patient.unite}`, 110, y + 14);
-                doc.text(`Corps: ${patient.corps}`, 18, y + 20);
-                doc.text(`N° Carte: ${patient.numeroCarte}`, 110, y + 20);
+                doc.text(`Nom: ${patient.prenom || ''} ${patient.nom || ''}`, 18, y + 8);
+                doc.text(`Matricule: ${patient.matricule || '-'}`, 110, y + 8);
+                doc.text(`Grade: ${patient.grade || '-'}`, 18, y + 14);
+                doc.text(`Unité: ${patient.unite || '-'}`, 110, y + 14);
+                doc.text(`Corps: ${patient.corps || '-'}`, 18, y + 20);
+                doc.text(`N° Carte: ${patient.numeroCarte || '-'}`, 110, y + 20);
                 y += 42;
+
+                // Médicaments
                 if (ord.produits && ord.produits.length > 0) {
                     doc.setTextColor(44, 90, 160);
-                    doc.setFontSize(12);
+                    doc.setFontSize(11);
                     doc.setFont('helvetica', 'bold');
                     doc.text('MÉDICAMENTS', 14, y);
                     y += 8;
+
                     doc.setFillColor(44, 90, 160);
-                    doc.rect(14, y - 5, 182, 7, 'F');
+                    doc.rect(14, y - 4, 182, 7, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(9);
                     doc.text('Médicament', 16, y);
-                    doc.text('Dosage', 90, y);
-                    doc.text('Quantité', 130, y);
-                    doc.text('Statut', 170, y);
+                    doc.text('Dosage', 85, y);
+                    doc.text('Qté', 130, y);
+                    doc.text('Statut', 160, y);
                     y += 5;
                     doc.setFont('helvetica', 'normal');
+
                     ord.produits.forEach((med, i) => {
                         if (i % 2 === 0) {
                             doc.setFillColor(240, 245, 255);
                             doc.rect(14, y - 4, 182, 6, 'F');
                         }
                         doc.setTextColor(40, 40, 40);
-                        doc.setFontSize(9);
+                        doc.setFontSize(8.5);
                         doc.text(med.name.substring(0, 28), 16, y);
-                        doc.text(med.dosage, 90, y);
-                        doc.text(med.qty.toString(), 130, y);
+                        doc.text(med.dosage || '-', 85, y);
+                        doc.text((med.qty || 1).toString(), 130, y);
                         doc.setTextColor(med.delivered ? 40 : 180, med.delivered ? 120 : 120, med.delivered ? 40 : 40);
                         doc.setFont('helvetica', 'bold');
-                        doc.text(med.delivered ? 'Delivre' : 'En attente', 170, y);
+                        doc.text(med.delivered ? '✅ Délivré' : '⏳ En attente', 160, y);
                         y += 6;
                     });
                     y += 8;
                 }
-                doc.setDrawColor(100, 150, 200);
-                doc.line(14, y, 196, y);
-                y += 8;
-                doc.setTextColor(44, 90, 160);
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text('RÉSUMÉ FINANCIER', 14, y);
-                y += 8;
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(60, 60, 60);
-                doc.text(`Couverture (${ord.coveragePercent || 80}%):`, 14, y);
-                doc.text(formatCurrency(ord.coverage), 140, y);
+
+                // Résumé financier
+                if (ord.coverage) {
+                    doc.setDrawColor(100, 150, 200);
+                    doc.line(14, y, 196, y);
+                    y += 8;
+                    doc.setTextColor(44, 90, 160);
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('RÉSUMÉ FINANCIER', 14, y);
+                    y += 8;
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(60, 60, 60);
+                    doc.text(`Couverture (${ord.coveragePercent || 80}%):`, 14, y);
+                    doc.text(formatCurrency(ord.coverage), 140, y);
+                    y += 6;
+                    if (ord.reste) {
+                        doc.setTextColor(220, 53, 69);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(`💰 À encaisser par le patient:`, 14, y);
+                        doc.text(formatCurrency(ord.reste), 140, y);
+                        y += 6;
+                    }
+                }
+
+                // ================================================================
+                // QR CODE - GÉNÉRATION AVEC jsPDF ET CANVAS
+                // ================================================================
+                try {
+                    // Construire les données du QR code
+                    const qrData = {
+                        id: ord.id,
+                        patient: `${patient.prenom || ''} ${patient.nom || ''}`.trim(),
+                        date: formatDate(ord.validatedAt || ord.createdAt)
+                    };
+
+                    // URL de l'API QR code
+                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(JSON.stringify(qrData))}&margin=10`;
+
+                    // Créer une image pour le QR code
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+
+                    await new Promise((resolve, reject) => {
+                        img.onload = () => {
+                            try {
+                                // Créer un canvas pour convertir l'image en base64
+                                const canvas = document.createElement('canvas');
+                                canvas.width = 200;
+                                canvas.height = 200;
+                                const ctx = canvas.getContext('2d');
+                                ctx.fillStyle = '#ffffff';
+                                ctx.fillRect(0, 0, 200, 200);
+                                ctx.drawImage(img, 0, 0, 200, 200);
+                                const dataUrl = canvas.toDataURL('image/png');
+
+                                // Ajouter le QR code au PDF
+                                const qrX = 150;
+                                const qrY = y + 5;
+                                const qrSize = 45;
+                                doc.addImage(dataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+                                // Ajouter un texte sous le QR code
+                                doc.setFontSize(8);
+                                doc.setFont('helvetica', 'normal');
+                                doc.setTextColor(100, 100, 100);
+                                doc.text('QR Code sécurisé', 172, qrY + qrSize + 5, { align: 'center' });
+                                doc.text('(Scannez en pharmacie)', 172, qrY + qrSize + 10, { align: 'center' });
+
+                                resolve();
+                            } catch (err) {
+                                reject(err);
+                            }
+                        };
+                        img.onerror = () => {
+                            console.warn('Impossible de charger le QR code, poursuite de la génération...');
+                            resolve();
+                        };
+                        img.src = qrUrl;
+                        // Timeout si l'image ne charge pas
+                        setTimeout(() => {
+                            if (!img.complete) {
+                                console.warn('Timeout QR code, poursuite...');
+                                resolve();
+                            }
+                        }, 5000);
+                    });
+                } catch (qrError) {
+                    console.warn('Erreur génération QR code:', qrError);
+                    // Continuer sans QR code
+                }
+
+                // Pied de page
                 doc.setFontSize(8);
                 doc.setTextColor(120, 120, 120);
-                doc.text('MiliSoin - Mutuelle Militaire Niger', 105, 285, { align: 'center' });
-                doc.save(`Ordonnance_${ord.id}.pdf`);
-                notify('✅ PDF téléchargé', 'success');
-            } catch (error) {
-                notify('Erreur: ' + error.message, 'error');
-            }
-        }
+                doc.text('MiliSoin - Mutuelle Militaire Niger - Document officiel', 105, 285, { align: 'center' });
 
-        function zoomImage(url) {
-            document.getElementById('zoomImage').src = url;
-            document.getElementById('imageZoom').classList.add('active');
+                // Télécharger le PDF
+                doc.save(`Ordonnance_${ord.id}.pdf`);
+                notify('✅ PDF téléchargé avec succès !', 'success');
+
+            } catch (error) {
+                console.error('Erreur PDF:', error);
+                notify('❌ Erreur lors de la génération du PDF: ' + error.message, 'error');
+            }
         }
 
         // ================================================================
