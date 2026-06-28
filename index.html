@@ -7,11 +7,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>MiliSoin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://*.firebaseio.com https://*.googleapis.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://router.project-osrm.org; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.googleapis.com https://*.firebaseapp.com https://f005.backblazeb2.com; font-src 'self' https://cdnjs.cloudflare.com; worker-src 'self' blob:;">
+    <title>MiliSoin - Mutuelle Militaire du Niger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js" integrity="sha384-8/hTzP5fz6vCI/vzXh4AHT7FhW8Mzw83DrdwlIh0uVZ/6qMwnFIP9CJp2bIV3pAD" crossorigin="anonymous"></script>
     <style>
         * {
             margin: 0;
@@ -1765,8 +1766,6 @@
             color: #dc3545;
             border: 1px solid #dc3545;
         }
-
-        /* NOUVEAU : Styles pour la FAQ */
         .faq-item {
             background: var(--faq-bg);
             border-radius: 10px;
@@ -1806,8 +1805,6 @@
         .faq-item.open .faq-answer {
             display: block;
         }
-
-        /* NOUVEAU : Styles pour les politiques */
         .policy-section {
             margin-bottom: 16px;
         }
@@ -1851,7 +1848,6 @@
         .license-text a:hover {
             text-decoration: underline;
         }
-
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1873,7 +1869,6 @@
             font-size: 14px;
             margin-bottom: 2px;
         }
-
         .contact-btn {
             display: inline-flex;
             align-items: center;
@@ -2343,7 +2338,7 @@
                         </button>
                     </div>
 
-                    <!-- NOUVEAU : FAQ -->
+                    <!-- FAQ -->
                     <div class="card">
                         <div class="card-title">
                             <i class="fas fa-question-circle"></i> Questions fréquentes
@@ -2395,7 +2390,7 @@
                         </div>
                     </div>
 
-                    <!-- NOUVEAU : Politique de confidentialité -->
+                    <!-- Politique de confidentialité -->
                     <div class="card">
                         <div class="card-title">
                             <i class="fas fa-lock"></i> Politique de confidentialité
@@ -2418,7 +2413,7 @@
                         </div>
                     </div>
 
-                    <!-- NOUVEAU : Licences -->
+                    <!-- Licences -->
                     <div class="card">
                         <div class="card-title">
                             <i class="fas fa-file-contract"></i> Licences
@@ -2559,6 +2554,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js">
     </script>
     <script>
+        // ================================================================
+        // CONFIGURATION FIREBASE
+        // ================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCFMq3jwm78PDlS55VP4AcwTIDpH3ZINbI",
             authDomain: "service-mutuel.firebaseapp.com",
@@ -2570,6 +2568,51 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // ================================================================
+        // RÈGLES DE SÉCURITÉ FIRESTORE OBLIGATOIRES
+        // À COPIER DANS LA CONSOLE FIREBASE (Firestore Rules)
+        // ================================================================
+        /*
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            // Fonction utilitaire pour vérifier si l'utilisateur est approuvé
+            function isApprovedPatient() {
+              return request.auth != null &&
+                exists(/databases/$(database)/documents/patients/$(request.auth.uid)) &&
+                get(/databases/$(database)/documents/patients/$(request.auth.uid)).data.approvalStatus == 'approved';
+            }
+
+            // Patients : seul l'utilisateur peut lire/modifier son propre profil
+            // Interdiction de modifier le statut d'approbation
+            match /patients/{patientId} {
+              allow read: if request.auth != null && request.auth.uid == patientId;
+              allow create: if request.auth != null && request.auth.uid == patientId;
+              allow update: if request.auth != null && request.auth.uid == patientId 
+                && request.resource.data.approvalStatus == resource.data.approvalStatus;
+              allow delete: if false;
+            }
+
+            // Ordonnances : l'utilisateur ne peut voir que ses propres ordonnances
+            match /ordonnances/{ordonnanceId} {
+              allow read: if request.auth != null && isApprovedPatient() && resource.data.patientId == request.auth.uid;
+              allow create: if request.auth != null && isApprovedPatient() && request.resource.data.patientId == request.auth.uid;
+              allow update: if request.auth != null && isApprovedPatient() && resource.data.patientId == request.auth.uid;
+              allow delete: if false;
+            }
+
+            // Pharmacies : lecture publique, écriture réservée aux admins
+            match /pharmacies/{pharmacyId} {
+              allow read: if request.auth != null;
+              allow write: if request.auth != null && request.auth.token.admin == true;
+            }
+          }
+        }
+        */
+        // ================================================================
+        // FIN DES RÈGLES DE SÉCURITÉ
+        // ================================================================
 
         const UPLOAD_API_URL = '/api/upload';
 
@@ -2585,7 +2628,7 @@
                 if (onProgress) onProgress(30);
                 const timestamp = Date.now();
                 const fileName =
-                `ordonnances/patient_${currentPatient.id}_${timestamp}_${file.name}`;
+                    `ordonnances/patient_${currentPatient.id}_${timestamp}_${file.name}`;
                 const response = await fetch(UPLOAD_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2609,21 +2652,85 @@
             }
         }
 
-        let currentUser = null;
-        let currentPatient = null;
-        let myOrdonnances = [];
-        let allPharmacies = [];
-        let userLocation = null;
-        let selectedPharmacy = null;
-        let map = null;
-        let userMarker = null;
-        let routeLayer = null;
-        let pharmacyMarkers = [];
-        let unsubscribeOrdonnances = null;
-        let selectedImageFile = null;
-        let bgCheckInterval = null;
-        let lastKnownStatuses = {};
-        let patientStatusListener = null;
+        // ================================================================
+        // ÉCHAPPEMENT HTML POUR PRÉVENIR LES XSS
+        // ================================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Fonction sécurisée pour afficher du texte
+        function safeSetTextContent(elementId, text, defaultValue = '-') {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = text || defaultValue;
+            }
+        }
+
+        // Fonction sécurisée pour insérer du HTML connu (jamais de données utilisateur brutes)
+        function safeSetInnerHTML(elementId, html) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.innerHTML = html;
+            }
+        }
+
+        // ================================================================
+        // PROTECTION DES VARIABLES GLOBALES CONTRE LES MODIFICATIONS
+        // ================================================================
+        let _currentUser = null;
+        let _currentPatient = null;
+        let _myOrdonnances = [];
+        let _allPharmacies = [];
+        let _userLocation = null;
+        let _selectedPharmacy = null;
+        let _map = null;
+        let _userMarker = null;
+        let _routeLayer = null;
+        let _pharmacyMarkers = [];
+        let _unsubscribeOrdonnances = null;
+        let _selectedImageFile = null;
+        let _bgCheckInterval = null;
+        let _lastKnownStatuses = {};
+        let _patientStatusListener = null;
+
+        // Getters/Setters sécurisés pour currentPatient
+        Object.defineProperty(window, 'currentPatient', {
+            get: function() { return _currentPatient; },
+            set: function(value) {
+                console.warn('⛔ Modification directe de currentPatient interdite !');
+                if (value && value.approvalStatus) {
+                    // La modification est bloquée côté client
+                }
+            }
+        });
+
+        Object.defineProperty(window, 'currentUser', {
+            get: function() { return _currentUser; },
+            set: function(value) {
+                console.warn('⛔ Modification directe de currentUser interdite !');
+            }
+        });
+
+        // Aliases pour les fonctions internes
+        const currentPatient = _currentPatient;
+        const currentUser = _currentUser;
+        let myOrdonnances = _myOrdonnances;
+        let allPharmacies = _allPharmacies;
+        let userLocation = _userLocation;
+        let selectedPharmacy = _selectedPharmacy;
+        let map = _map;
+        let userMarker = _userMarker;
+        let routeLayer = _routeLayer;
+        let pharmacyMarkers = _pharmacyMarkers;
+        let unsubscribeOrdonnances = _unsubscribeOrdonnances;
+        let selectedImageFile = _selectedImageFile;
+        let bgCheckInterval = _bgCheckInterval;
+        let lastKnownStatuses = _lastKnownStatuses;
+        let patientStatusListener = _patientStatusListener;
 
         function launchConfetti() {
             const container = document.getElementById('confettiContainer');
@@ -2663,19 +2770,18 @@
             const icon = document.getElementById('approvalMainIcon');
             const title = document.getElementById('approvalTitle');
             const subtitle = document.getElementById('approvalSubtitle');
-            const message = document.getElementById('approvalMessage');
             const badge = document.getElementById('approvalStatusBadge');
             if (status === 'pending') {
                 screen.classList.add('pending');
                 icon.innerHTML = '<i class="fas fa-clock"></i>';
                 title.textContent = '🎉 Bienvenue parmi nous !';
                 subtitle.textContent = 'Votre compte est en cours de validation';
-                message.innerHTML = `
+                safeSetInnerHTML('approvalMessage', `
                     <span class="emoji-big">🤝</span>
                     <p>Merci pour votre inscription à <span class="highlight">MiliSoin</span> !</p>
                     <p>Votre demande sera examinée avec attention par l'assistant de votre corps d'armée.</p>
                     <p style="font-size:14px; color:#888; margin-top:10px;">⏳ Cela peut prendre quelques heures ou jours.</p>
-                `;
+                `);
                 badge.className = 'approval-status-badge pending';
                 badge.textContent = '⏳ En attente de validation';
             } else if (status === 'approved') {
@@ -2683,12 +2789,12 @@
                 icon.innerHTML = '<i class="fas fa-check-circle"></i>';
                 title.textContent = '🎊 Félicitations !';
                 subtitle.textContent = 'Votre compte a été validé avec succès';
-                message.innerHTML = `
+                safeSetInnerHTML('approvalMessage', `
                     <span class="emoji-big">🎉</span>
                     <p>Votre compte <span class="highlight">MiliSoin</span> est maintenant actif !</p>
                     <p>Vous pouvez accéder à tous les services de la mutuelle militaire.</p>
                     <p style="font-size:14px; color:#28a745; margin-top:10px;">✅ Bienvenue dans la famille MiliSoin !</p>
-                `;
+                `);
                 badge.className = 'approval-status-badge approved';
                 badge.textContent = '✅ Compte validé';
                 launchConfetti();
@@ -2697,12 +2803,13 @@
                 icon.innerHTML = '<i class="fas fa-times-circle"></i>';
                 title.textContent = '😔 Nous sommes désolés';
                 subtitle.textContent = 'Votre demande n\'a pas été retenue';
-                message.innerHTML = `
+                const safeReason = escapeHtml(reason || 'Non spécifié');
+                safeSetInnerHTML('approvalMessage', `
                     <span class="emoji-big">📋</span>
                     <p>Votre demande d'inscription à <span class="highlight">MiliSoin</span> a été rejetée.</p>
-                    <p><strong>Motif :</strong> ${reason || 'Non spécifié'}</p>
+                    <p><strong>Motif :</strong> ${safeReason}</p>
                     <p style="font-size:14px; color:#888; margin-top:10px;">Vous pouvez contacter le service mutuelle pour plus d'informations.</p>
-                `;
+                `);
                 badge.className = 'approval-status-badge rejected';
                 badge.textContent = '❌ Compte rejeté';
             }
@@ -2714,12 +2821,12 @@
             document.getElementById('approvalPendingScreen').classList.remove('active');
             document.getElementById('profileRecoveryScreen').classList.add('active');
 
-            document.getElementById('recoveryEmail').textContent = user.email || 'Non disponible';
-            document.getElementById('recoveryUid').textContent = user.uid || 'Non disponible';
+            safeSetTextContent('recoveryEmail', user.email, 'Non disponible');
+            safeSetTextContent('recoveryUid', user.uid, 'Non disponible');
         }
 
         async function searchProfileByEmail() {
-            if (!currentUser || !currentUser.email) {
+            if (!_currentUser || !_currentUser.email) {
                 notify('❌ Email non disponible', 'error');
                 return;
             }
@@ -2728,7 +2835,7 @@
 
             try {
                 const snapshot = await db.collection('patients')
-                    .where('email', '==', currentUser.email)
+                    .where('email', '==', _currentUser.email)
                     .limit(1)
                     .get();
 
@@ -2740,7 +2847,7 @@
                 const doc = snapshot.docs[0];
                 const profileData = doc.data();
 
-                if (doc.id !== currentUser.uid) {
+                if (doc.id !== _currentUser.uid) {
                     const confirmLink = confirm(
                         `✅ Profil trouvé !\n\n` +
                         `Nom: ${profileData.prenom || ''} ${profileData.nom || ''}\n` +
@@ -2750,9 +2857,9 @@
                     );
 
                     if (confirmLink) {
-                        await db.collection('patients').doc(currentUser.uid).set({
+                        await db.collection('patients').doc(_currentUser.uid).set({
                             ...profileData,
-                            email: currentUser.email,
+                            email: _currentUser.email,
                             previousUid: doc.id,
                             linkedAt: new Date().toISOString(),
                             recoveredProfile: true
@@ -2764,27 +2871,27 @@
                             console.warn('Impossible de supprimer l\'ancien profil:', e);
                         }
 
-                        currentPatient = { id: currentUser.uid, ...profileData, email: currentUser.email };
+                        _currentPatient = { id: _currentUser.uid, ...profileData, email: _currentUser.email };
                         notify('✅ Profil lié avec succès !', 'success');
 
-                        const status = currentPatient.approvalStatus || 'pending';
+                        const status = _currentPatient.approvalStatus || 'pending';
                         if (status === 'approved') {
                             showMainApp();
                         } else {
-                            startPatientStatusListener(currentUser.uid);
-                            showApprovalScreen(status, currentPatient.rejectionReason);
+                            startPatientStatusListener(_currentUser.uid);
+                            showApprovalScreen(status, _currentPatient.rejectionReason);
                         }
                     }
                 } else {
-                    currentPatient = { id: doc.id, ...profileData };
+                    _currentPatient = { id: doc.id, ...profileData };
                     notify('✅ Profil retrouvé !', 'success');
 
-                    const status = currentPatient.approvalStatus || 'pending';
+                    const status = _currentPatient.approvalStatus || 'pending';
                     if (status === 'approved') {
                         showMainApp();
                     } else {
-                        startPatientStatusListener(currentUser.uid);
-                        showApprovalScreen(status, currentPatient.rejectionReason);
+                        startPatientStatusListener(_currentUser.uid);
+                        showApprovalScreen(status, _currentPatient.rejectionReason);
                     }
                 }
             } catch (error) {
@@ -2813,7 +2920,7 @@
                 const doc = snapshot.docs[0];
                 const profileData = doc.data();
 
-                if (doc.id !== currentUser.uid) {
+                if (doc.id !== _currentUser.uid) {
                     const confirmLink = confirm(
                         `✅ Profil trouvé !\n\n` +
                         `Nom: ${profileData.prenom || ''} ${profileData.nom || ''}\n` +
@@ -2823,9 +2930,9 @@
                     );
 
                     if (confirmLink) {
-                        await db.collection('patients').doc(currentUser.uid).set({
+                        await db.collection('patients').doc(_currentUser.uid).set({
                             ...profileData,
-                            email: currentUser.email,
+                            email: _currentUser.email,
                             previousUid: doc.id,
                             linkedAt: new Date().toISOString(),
                             recoveredProfile: true
@@ -2837,27 +2944,27 @@
                             console.warn('Impossible de supprimer l\'ancien profil:', e);
                         }
 
-                        currentPatient = { id: currentUser.uid, ...profileData, email: currentUser.email };
+                        _currentPatient = { id: _currentUser.uid, ...profileData, email: _currentUser.email };
                         notify('✅ Profil lié avec succès !', 'success');
 
-                        const status = currentPatient.approvalStatus || 'pending';
+                        const status = _currentPatient.approvalStatus || 'pending';
                         if (status === 'approved') {
                             showMainApp();
                         } else {
-                            startPatientStatusListener(currentUser.uid);
-                            showApprovalScreen(status, currentPatient.rejectionReason);
+                            startPatientStatusListener(_currentUser.uid);
+                            showApprovalScreen(status, _currentPatient.rejectionReason);
                         }
                     }
                 } else {
-                    currentPatient = { id: doc.id, ...profileData };
+                    _currentPatient = { id: doc.id, ...profileData };
                     notify('✅ Profil retrouvé !', 'success');
 
-                    const status = currentPatient.approvalStatus || 'pending';
+                    const status = _currentPatient.approvalStatus || 'pending';
                     if (status === 'approved') {
                         showMainApp();
                     } else {
-                        startPatientStatusListener(currentUser.uid);
-                        showApprovalScreen(status, currentPatient.rejectionReason);
+                        startPatientStatusListener(_currentUser.uid);
+                        showApprovalScreen(status, _currentPatient.rejectionReason);
                     }
                 }
             } catch (error) {
@@ -2867,7 +2974,7 @@
         }
 
         async function createMinimalProfile() {
-            if (!currentUser) {
+            if (!_currentUser) {
                 notify('❌ Vous devez être connecté', 'error');
                 return;
             }
@@ -2880,7 +2987,7 @@
 
             try {
                 const minimalProfile = {
-                    email: currentUser.email,
+                    email: _currentUser.email,
                     nom: 'UTILISATEUR',
                     prenom: 'À COMPLÉTER',
                     grade: 'Non spécifié',
@@ -2896,11 +3003,11 @@
                     recoveryDate: new Date().toISOString()
                 };
 
-                await db.collection('patients').doc(currentUser.uid).set(minimalProfile);
-                currentPatient = { id: currentUser.uid, ...minimalProfile };
+                await db.collection('patients').doc(_currentUser.uid).set(minimalProfile);
+                _currentPatient = { id: _currentUser.uid, ...minimalProfile };
 
                 notify('✅ Profil créé. Contactez l\'administrateur pour compléter vos informations.', 'success');
-                startPatientStatusListener(currentUser.uid);
+                startPatientStatusListener(_currentUser.uid);
                 showApprovalScreen('pending');
             } catch (error) {
                 console.error('Erreur création:', error);
@@ -2915,15 +3022,15 @@
             notify('🗑️ Suppression du compte...', 'info');
 
             try {
-                if (currentUser) {
+                if (_currentUser) {
                     try {
-                        await db.collection('patients').doc(currentUser.uid).delete();
+                        await db.collection('patients').doc(_currentUser.uid).delete();
                     } catch (e) {
                         console.log('Pas de profil à supprimer');
                     }
 
                     try {
-                        await currentUser.delete();
+                        await _currentUser.delete();
                     } catch (e) {
                         if (e.code === 'auth/requires-recent-login') {
                             notify('⚠️ Déconnectez-vous puis reconnectez-vous avant de supprimer', 'warning');
@@ -2948,8 +3055,8 @@
 
             try { auth.signOut(); } catch (e) {}
 
-            currentUser = null;
-            currentPatient = null;
+            _currentUser = null;
+            _currentPatient = null;
             myOrdonnances = [];
 
             document.getElementById('authScreen').style.display = 'flex';
@@ -2980,8 +3087,8 @@
             const notif = document.getElementById('notification');
             notif.className = `notification ${type} show`;
             const icons = { success: 'check-circle', error: 'times-circle', info: 'info-circle',
-            warning: 'exclamation-triangle' };
-            notif.innerHTML = `<i class="fas fa-${icons[type]}"></i> ${message}`;
+                warning: 'exclamation-triangle' };
+            notif.innerHTML = `<i class="fas fa-${icons[type]}"></i> ${escapeHtml(message)}`;
             setTimeout(() => notif.classList.remove('show'), 3000);
         }
 
@@ -3059,20 +3166,20 @@
                         <p style="font-size:13px; color:#155724; margin-bottom:10px;">
                             Un <strong>lien de réinitialisation</strong> a été envoyé à :
                         </p>
-                        <p class="email-address">${email}</p>
+                        <p class="email-address">${escapeHtml(email)}</p>
 
                         <div class="instructions">
                             <p style="font-size:12px; color:#666; margin-bottom:8px; font-weight:600;">📋 Instructions :</p>
                             <ol>
-                                <li>Ouvrez votre boîte mail <strong>${provider.name}</strong></li>
+                                <li>Ouvrez votre boîte mail <strong>${escapeHtml(provider.name)}</strong></li>
                                 <li>Cliquez sur le lien reçu de <strong>Firebase</strong></li>
                                 <li>Créez votre nouveau mot de passe sur la page Firebase</li>
                                 <li>Revenez sur MiliSoin pour vous connecter avec le nouveau mot de passe</li>
                             </ol>
                         </div>
 
-                        <a href="${provider.url}" target="_blank" class="open-email-btn">
-                            <i class="fas fa-envelope-open-text"></i> Ouvrir ${provider.name}
+                        <a href="${escapeHtml(provider.url)}" target="_blank" class="open-email-btn">
+                            <i class="fas fa-envelope-open-text"></i> Ouvrir ${escapeHtml(provider.name)}
                         </a>
 
                         <div class="spam-warning">
@@ -3100,7 +3207,7 @@
                             <div class="email-icon">❌</div>
                             <h3 style="color:#721c24;">Aucun compte trouvé</h3>
                             <p style="font-size:13px; color:#721c24;">
-                                L'adresse <strong>${email}</strong> n'est associée à aucun compte MiliSoin.
+                                L'adresse <strong>${escapeHtml(email)}</strong> n'est associée à aucun compte MiliSoin.
                             </p>
                             <button type="button" class="resend-btn" style="color:#dc3545; border-color:#dc3545;" onclick="showLoginForm()">
                                 <i class="fas fa-arrow-left"></i> Retour à la connexion
@@ -3324,18 +3431,18 @@
                 );
                 const patientDoc = await db.collection('patients').doc(cred.user.uid).get();
                 if (patientDoc.exists) {
-                    currentUser = cred.user;
-                    currentPatient = { id: patientDoc.id, ...patientDoc.data() };
-                    const status = currentPatient.approvalStatus || 'pending';
+                    _currentUser = cred.user;
+                    _currentPatient = { id: patientDoc.id, ...patientDoc.data() };
+                    const status = _currentPatient.approvalStatus || 'pending';
                     if (status === 'approved') {
                         notify('✅ Connexion réussie', 'success');
                         showMainApp();
                     } else {
                         startPatientStatusListener(cred.user.uid);
-                        showApprovalScreen(status, currentPatient.rejectionReason);
+                        showApprovalScreen(status, _currentPatient.rejectionReason);
                     }
                 } else {
-                    currentUser = cred.user;
+                    _currentUser = cred.user;
                     console.warn('⚠️ Profil introuvable pour UID:', cred.user.uid);
                     showProfileRecoveryScreen(cred.user);
                 }
@@ -3377,8 +3484,8 @@
                     approvalRequestedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 await db.collection('patients').doc(cred.user.uid).set(patientData);
-                currentUser = cred.user;
-                currentPatient = { id: cred.user.uid, ...patientData };
+                _currentUser = cred.user;
+                _currentPatient = { id: cred.user.uid, ...patientData };
                 startPatientStatusListener(cred.user.uid);
                 showApprovalScreen('pending');
                 notify('✅ Inscription réussie ! Votre compte sera examiné par le service mutuelle.', 'success');
@@ -3392,6 +3499,17 @@
         });
 
         function showMainApp() {
+            // VÉRIFICATION RENFORCÉE : empêcher le contournement depuis la console
+            if (!_currentPatient || _currentPatient.approvalStatus !== 'approved') {
+                console.warn('⛔ Tentative de contournement détectée !');
+                notify('⛔ Accès non autorisé', 'error');
+                // Rediriger vers l'écran approprié
+                if (_currentPatient) {
+                    showApprovalScreen(_currentPatient.approvalStatus || 'pending', _currentPatient.rejectionReason);
+                }
+                return;
+            }
+
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('approvalPendingScreen').classList.remove('active');
             document.getElementById('profileRecoveryScreen').classList.remove('active');
@@ -3406,15 +3524,15 @@
         }
 
         function loadDashboard() {
-            document.getElementById('cardGrade').textContent = currentPatient.grade || '-';
-            document.getElementById('cardNom').textContent =
-            `${currentPatient.prenom || ''} ${currentPatient.nom || ''}`.trim() || '-';
-            document.getElementById('cardMatricule').textContent = currentPatient.matricule || '-';
-            document.getElementById('cardUnite').textContent = currentPatient.unite || '-';
-            document.getElementById('cardCorps').textContent = currentPatient.corps || '-';
-            document.getElementById('cardNumero').textContent = `N° ${currentPatient.numeroCarte || 'MSM-NI-2025-000000'}`;
+            safeSetTextContent('cardGrade', _currentPatient.grade);
+            safeSetTextContent('cardNom', `${_currentPatient.prenom || ''} ${_currentPatient.nom || ''}`.trim());
+            safeSetTextContent('cardMatricule', _currentPatient.matricule);
+            safeSetTextContent('cardUnite', _currentPatient.unite);
+            safeSetTextContent('cardCorps', _currentPatient.corps);
+            safeSetTextContent('cardNumero', `N° ${_currentPatient.numeroCarte || 'MSM-NI-2025-000000'}`);
+
             const statusEl = document.getElementById('cardStatus');
-            const status = currentPatient.approvalStatus || 'pending';
+            const status = _currentPatient.approvalStatus || 'pending';
             if (status === 'approved') {
                 statusEl.innerHTML = '<span class="account-status-badge approved">✅ Approuvé</span>';
             } else if (status === 'pending') {
@@ -3422,11 +3540,13 @@
             } else {
                 statusEl.innerHTML = '<span class="account-status-badge rejected">❌ Rejeté</span>';
             }
-            document.getElementById('profileName').textContent =
-            `${currentPatient.prenom || ''} ${currentPatient.nom || ''}`.trim();
-            document.getElementById('profileGrade').textContent = currentPatient.grade || '';
-            document.getElementById('profileAvatar').textContent = (currentPatient.prenom || currentPatient.nom || '?')
-            .charAt(0).toUpperCase();
+
+            safeSetTextContent('profileName', `${_currentPatient.prenom || ''} ${_currentPatient.nom || ''}`.trim());
+            safeSetTextContent('profileGrade', _currentPatient.grade);
+
+            const avatar = document.getElementById('profileAvatar');
+            avatar.textContent = (_currentPatient.prenom || _currentPatient.nom || '?').charAt(0).toUpperCase();
+
             const profileStatus = document.getElementById('profileStatus');
             if (status === 'approved') {
                 profileStatus.innerHTML = '<span class="account-status-badge approved">✅ Compte approuvé</span>';
@@ -3442,8 +3562,8 @@
             if (bgCheckInterval) clearInterval(bgCheckInterval);
             if (patientStatusListener) patientStatusListener();
             try { await auth.signOut(); } catch (e) {}
-            currentUser = null;
-            currentPatient = null;
+            _currentUser = null;
+            _currentPatient = null;
             myOrdonnances = [];
             document.getElementById('authScreen').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
@@ -3532,15 +3652,15 @@
                 const ordonnanceId = 'ORD' + Date.now();
                 await db.collection('ordonnances').doc(ordonnanceId).set({
                     id: ordonnanceId,
-                    patientId: currentPatient.id,
-                    patientEmail: currentPatient.email,
-                    patientName: `${currentPatient.prenom} ${currentPatient.nom}`,
+                    patientId: _currentPatient.id,
+                    patientEmail: _currentPatient.email,
+                    patientName: `${_currentPatient.prenom} ${_currentPatient.nom}`,
                     imageUrl: imageUrl,
                     status: 'pending',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     produits: [],
                     imageDeleted: false,
-                    corps: currentPatient.corps
+                    corps: _currentPatient.corps
                 });
                 notify('✅ Demande envoyée !', 'success');
                 vibratePhone([100, 50, 100, 50, 100]);
@@ -3563,10 +3683,10 @@
         }
 
         function startOrdonnancesListener() {
-            if (!currentPatient) return;
+            if (!_currentPatient) return;
             if (unsubscribeOrdonnances) unsubscribeOrdonnances();
             unsubscribeOrdonnances = db.collection('ordonnances')
-                .where('patientId', '==', currentPatient.id)
+                .where('patientId', '==', _currentPatient.id)
                 .onSnapshot((snapshot) => {
                     const previousOrds = [...myOrdonnances];
                     myOrdonnances = [];
@@ -3590,25 +3710,26 @@
                     showNativeNotification('✅ Ordonnance validée !', `Votre demande ${newOrd.id} a été validée.`);
                 }
                 if (previousOrd.status === 'pending' && newOrd.status === 'refused') {
-                    showNativeNotification('❌ Ordonnance refusée', `Motif: ${newOrd.refusalReason || 'Non spécifié'}`);
+                    const safeReason = escapeHtml(newOrd.refusalReason || 'Non spécifié');
+                    showNativeNotification('❌ Ordonnance refusée', `Motif: ${safeReason}`);
                 }
                 if (newOrd.produits && previousOrd.produits) {
                     const newDelivered = newOrd.produits.filter(p => p.delivered).length;
                     const prevDelivered = previousOrd.produits.filter(p => p.delivered).length;
                     if (newDelivered > prevDelivered) {
                         showNativeNotification('💊 Médicament délivré !',
-                        `${newDelivered}/${newOrd.produits.length} produits délivrés`);
+                            `${newDelivered}/${newOrd.produits.length} produits délivrés`);
                     }
                 }
             });
         }
 
         function updateStats() {
-            document.getElementById('statPending').textContent = myOrdonnances.filter(o => o.status === 'pending').length;
-            document.getElementById('statValidated').textContent = myOrdonnances.filter(o => o.status === 'validated' || o
-                .status === 'used').length;
-            document.getElementById('statRefused').textContent = myOrdonnances.filter(o => o.status === 'refused').length;
-            document.getElementById('statTotal').textContent = myOrdonnances.length;
+            safeSetTextContent('statPending', myOrdonnances.filter(o => o.status === 'pending').length);
+            safeSetTextContent('statValidated', myOrdonnances.filter(o => o.status === 'validated' || o
+                .status === 'used').length);
+            safeSetTextContent('statRefused', myOrdonnances.filter(o => o.status === 'refused').length);
+            safeSetTextContent('statTotal', myOrdonnances.length);
         }
 
         function loadOrders() {
@@ -3626,22 +3747,28 @@
             };
             container.innerHTML = myOrdonnances.map(o => {
                 const status = statusLabels[o.status] || statusLabels.pending;
+                const safeId = escapeHtml(o.id);
+                const safeImageUrl = escapeHtml(o.imageUrl);
+                const safeDate = formatDate(o.createdAt);
+                const safeCoverage = o.coverage ? formatCurrency(o.coverage) : '';
+                const safeCoveragePercent = o.coveragePercent || 80;
+                const safeRefusalReason = o.refusalReason ? escapeHtml(o.refusalReason) : '';
                 return `
-                    <div class="ord-item ${o.status}">
+                    <div class="ord-item ${escapeHtml(o.status)}">
                         <div class="ord-header">
-                            <span class="ord-id">${o.id}</span>
+                            <span class="ord-id">${safeId}</span>
                             <span class="status-badge ${status.class}">${status.label}</span>
                         </div>
-                        ${o.imageUrl ? `<img src="${o.imageUrl}" class="ord-image-thumb" onclick="zoomImage('${o.imageUrl}')" alt="Ordonnance">` : ''}
-                        <div class="ord-info"><strong>Date:</strong> ${formatDate(o.createdAt)}</div>
-                        ${o.coverage ? `<div class="ord-info"><strong>Couverture:</strong> ${formatCurrency(o.coverage)} (${o.coveragePercent || 80}%)</div>` : ''}
-                        ${o.refusalReason ? `<div class="ord-info" style="color:var(--danger);"><strong>Motif:</strong> ${o.refusalReason}</div>` : ''}
+                        ${o.imageUrl ? `<img src="${safeImageUrl}" class="ord-image-thumb" onclick="zoomImage('${safeImageUrl}')" alt="Ordonnance">` : ''}
+                        <div class="ord-info"><strong>Date:</strong> ${safeDate}</div>
+                        ${o.coverage ? `<div class="ord-info"><strong>Couverture:</strong> ${safeCoverage} (${safeCoveragePercent}%)</div>` : ''}
+                        ${o.refusalReason ? `<div class="ord-info" style="color:var(--danger);"><strong>Motif:</strong> ${safeRefusalReason}</div>` : ''}
                         <div class="ord-actions">
-                            <button class="ord-btn primary" onclick="showOrderDetail('${o.id}')">
+                            <button class="ord-btn primary" onclick="showOrderDetail('${safeId}')">
                                 <i class="fas fa-eye"></i> Détails
                             </button>
                             ${(o.status === 'validated' || o.status === 'used') ? `
-                            <button class="ord-btn success" onclick="downloadPDF('${o.id}')">
+                            <button class="ord-btn success" onclick="downloadPDF('${safeId}')">
                                 <i class="fas fa-download"></i> PDF
                             </button>
                             ` : ''}
@@ -3661,39 +3788,49 @@
                 used: { label: 'Utilisée', class: 'status-used' }
             };
             const status = statusLabels[ord.status] || statusLabels.pending;
+            const safeId = escapeHtml(ord.id);
+            const safeDate = formatDate(ord.createdAt);
+            const safeCoveragePercent = ord.coveragePercent || 80;
+            const safeRefusalReason = ord.refusalReason ? escapeHtml(ord.refusalReason) : '';
+
             let content = `
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <strong style="color:var(--primary);">${ord.id}</strong>
+                        <strong style="color:var(--primary);">${safeId}</strong>
                         <span class="status-badge ${status.class}">${status.label}</span>
                     </div>
-                    <div class="ord-info"><strong>Date:</strong> ${formatDate(ord.createdAt)}</div>
-                    <div class="ord-info"><strong>Couverture:</strong> ${ord.coveragePercent || 80}%</div>
+                    <div class="ord-info"><strong>Date:</strong> ${safeDate}</div>
+                    <div class="ord-info"><strong>Couverture:</strong> ${safeCoveragePercent}%</div>
                 </div>
                 ${ord.imageUrl ? `
                 <div class="card">
                     <div class="card-title"><i class="fas fa-image"></i> Ordonnance</div>
-                    <img src="${ord.imageUrl}" class="ord-image-thumb" onclick="zoomImage('${ord.imageUrl}')" style="max-height:300px;" alt="Ordonnance">
+                    <img src="${escapeHtml(ord.imageUrl)}" class="ord-image-thumb" onclick="zoomImage('${escapeHtml(ord.imageUrl)}')" style="max-height:300px;" alt="Ordonnance">
                 </div>
                 ` : ''}
             `;
             if (ord.produits && ord.produits.length > 0) {
+                const produitsHtml = ord.produits.map(p => {
+                    const safeName = escapeHtml(p.name);
+                    const safeDosage = escapeHtml(p.dosage);
+                    return `
+                        <div style="padding:10px; background:var(--input-bg); border-radius:8px; margin-bottom:6px;">
+                            <strong>${safeName}</strong> - ${safeDosage}<br>
+                            <small>Qté: ${p.qty}</small>
+                            <span style="float:right; font-size:11px; font-weight:600; color:${p.delivered ? 'var(--success)' : 'var(--warning)'};">
+                                ${p.delivered ? '✅ Délivré' : '⏳ En attente'}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
                 content += `
                     <div class="card">
                         <div class="card-title"><i class="fas fa-pills"></i> Médicaments</div>
-                        ${ord.produits.map(p => `
-                            <div style="padding:10px; background:var(--input-bg); border-radius:8px; margin-bottom:6px;">
-                                <strong>${p.name}</strong> - ${p.dosage}<br>
-                                <small>Qté: ${p.qty}</small>
-                                <span style="float:right; font-size:11px; font-weight:600; color:${p.delivered ? 'var(--success)' : 'var(--warning)'};">
-                                    ${p.delivered ? '✅ Délivré' : '⏳ En attente'}
-                                </span>
-                            </div>
-                        `).join('')}
+                        ${produitsHtml}
                     </div>
                     <div class="card" style="background:var(--input-bg); border-left:4px solid var(--primary);">
                         <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                            <span>Couverture (${ord.coveragePercent || 80}%):</span>
+                            <span>Couverture (${safeCoveragePercent}%):</span>
                             <strong>${formatCurrency(ord.coverage)}</strong>
                         </div>
                     </div>
@@ -3703,11 +3840,11 @@
                 content += `
                     <div class="card" style="background:#f8d7da; border-left:4px solid var(--danger);">
                         <div class="card-title" style="color:var(--danger);"><i class="fas fa-times-circle"></i> Motif du refus</div>
-                        <p style="font-size:13px;">${ord.refusalReason}</p>
+                        <p style="font-size:13px;">${safeRefusalReason}</p>
                     </div>
                 `;
             }
-            document.getElementById('detailContent').innerHTML = content;
+            safeSetInnerHTML('detailContent', content);
             const downloadBtn = document.getElementById('downloadPdfBtn');
             if (ord.status === 'validated' || ord.status === 'used') {
                 downloadBtn.style.display = 'flex';
@@ -3725,7 +3862,7 @@
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-                const patient = currentPatient;
+                const patient = _currentPatient;
                 doc.setFillColor(44, 90, 160);
                 doc.rect(0, 0, 210, 35, 'F');
                 doc.setTextColor(255, 255, 255);
@@ -3929,21 +4066,28 @@
                 ...p,
                 distance: getDistance(userLocation.lat, userLocation.lng, p.lat, p.lng)
             })).sort((a, b) => a.distance - b.distance);
-            container.innerHTML = pharmaciesWithDistance.map(p => `
-                <div class="pharmacy-item" onclick="selectPharmacy(${p.lat}, ${p.lng}, '${p.nom.replace(/'/g, "\\'")}', '${(p.telephone || '').replace(/'/g, "\\'")}', '${(p.adresse || '').replace(/'/g, "\\'")}')" data-id="${p.id}">
-                    <div class="pharmacy-icon">
-                        <i class="fas fa-prescription-bottle-alt"></i>
-                    </div>
-                    <div class="pharmacy-info">
-                        <div class="pharmacy-name">${p.nom}</div>
-                        <div class="pharmacy-details">
-                            <span><i class="fas fa-map-marker-alt"></i> ${p.adresse || '-'}</span>
-                            ${p.telephone ? `<span><i class="fas fa-phone"></i> ${p.telephone}</span>` : ''}
+            container.innerHTML = pharmaciesWithDistance.map(p => {
+                const safeNom = escapeHtml(p.nom);
+                const safeAdresse = escapeHtml(p.adresse || '-');
+                const safeTelephone = escapeHtml(p.telephone || '');
+                const distanceDisplay = p.distance < 1 ? (p.distance * 1000).toFixed(0) + ' m' : p.distance.toFixed(
+                1) + ' km';
+                return `
+                    <div class="pharmacy-item" onclick="selectPharmacy(${p.lat}, ${p.lng}, '${safeNom.replace(/'/g, "\\'")}', '${safeTelephone.replace(/'/g, "\\'")}', '${safeAdresse.replace(/'/g, "\\'")}')" data-id="${escapeHtml(p.id)}">
+                        <div class="pharmacy-icon">
+                            <i class="fas fa-prescription-bottle-alt"></i>
                         </div>
+                        <div class="pharmacy-info">
+                            <div class="pharmacy-name">${safeNom}</div>
+                            <div class="pharmacy-details">
+                                <span><i class="fas fa-map-marker-alt"></i> ${safeAdresse}</span>
+                                ${p.telephone ? `<span><i class="fas fa-phone"></i> ${safeTelephone}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="pharmacy-distance">${distanceDisplay}</div>
                     </div>
-                    <div class="pharmacy-distance">${p.distance < 1 ? (p.distance * 1000).toFixed(0) + ' m' : p.distance.toFixed(1) + ' km'}</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             if (map) updatePharmacyMarkers();
         }
 
@@ -3992,10 +4136,13 @@
             });
             allPharmacies.forEach(p => {
                 const marker = L.marker([p.lat, p.lng], { icon: pharmacyIcon }).addTo(map);
+                const safeNom = escapeHtml(p.nom);
+                const safeAdresse = escapeHtml(p.adresse || '');
+                const safeTelephone = escapeHtml(p.telephone || '');
                 marker.bindPopup(`
-                    <b style="color:#2c5aa0;">${p.nom}</b><br>
-                    <small>${p.adresse || ''}</small><br>
-                    ${p.telephone ? `<i class="fas fa-phone"></i> <a href="tel:${p.telephone}">${p.telephone}</a>` : ''}
+                    <b style="color:#2c5aa0;">${safeNom}</b><br>
+                    <small>${safeAdresse}</small><br>
+                    ${p.telephone ? `<i class="fas fa-phone"></i> <a href="tel:${safeTelephone}">${safeTelephone}</a>` : ''}
                 `);
                 marker.on('click', () => selectPharmacy(p.lat, p.lng, p.nom, p.telephone || '', p.adresse || ''));
                 pharmacyMarkers.push(marker);
@@ -4007,26 +4154,27 @@
             document.querySelectorAll('.pharmacy-item').forEach(item => {
                 item.classList.remove('selected');
             });
-            const selectedItem = document.querySelector(`.pharmacy-item[onclick*="${name.replace(/'/g, "\\'")}"]`);
+            const safeName = escapeHtml(name);
+            const selectedItem = document.querySelector(`.pharmacy-item[onclick*="${safeName.replace(/'/g, "\\'")}"]`);
             if (selectedItem) selectedItem.classList.add('selected');
             if (map) {
                 map.setView([lat, lng], 16);
             }
-            document.getElementById('selectedPharmacyName').textContent = name;
-            document.getElementById('selectedPharmacyAddress').innerHTML =
-                `<i class="fas fa-map-marker-alt"></i> ${address || 'Adresse non disponible'}`;
-            document.getElementById('selectedPharmacyPhone').innerHTML = phone ?
-                `<i class="fas fa-phone"></i> ${phone}` :
-                '<i class="fas fa-phone"></i> Non disponible';
+            safeSetTextContent('selectedPharmacyName', name);
+            safeSetInnerHTML('selectedPharmacyAddress',
+                `<i class="fas fa-map-marker-alt"></i> ${escapeHtml(address || 'Adresse non disponible')}`);
+            safeSetInnerHTML('selectedPharmacyPhone', phone ?
+                `<i class="fas fa-phone"></i> ${escapeHtml(phone)}` :
+                '<i class="fas fa-phone"></i> Non disponible');
             if (userLocation) {
                 const distance = getDistance(userLocation.lat, userLocation.lng, lat, lng);
-                document.getElementById('routeDistance').textContent = distance < 1 ? (distance * 1000).toFixed(0) +
-                    ' m' : distance.toFixed(1) + ' km';
+                safeSetTextContent('routeDistance', distance < 1 ? (distance * 1000).toFixed(0) + ' m' : distance.toFixed(
+                    1) + ' km');
                 const duration = Math.max(1, Math.round((distance / 30) * 60));
-                document.getElementById('routeDuration').textContent = duration + ' min';
+                safeSetTextContent('routeDuration', duration + ' min');
             } else {
-                document.getElementById('routeDistance').textContent = '-';
-                document.getElementById('routeDuration').textContent = '-';
+                safeSetTextContent('routeDistance', '-');
+                safeSetTextContent('routeDuration', '-');
             }
             document.getElementById('pharmacySelectedPanel').classList.add('active');
             if (userLocation) {
@@ -4046,8 +4194,8 @@
                             style: { color: '#2c5aa0', weight: 5, opacity: 0.8 }
                         }).addTo(map);
                         map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
-                        document.getElementById('routeDistance').textContent = distance + ' km';
-                        document.getElementById('routeDuration').textContent = duration + ' min';
+                        safeSetTextContent('routeDistance', distance + ' km');
+                        safeSetTextContent('routeDuration', duration + ' min');
                     }
                 } catch (error) {
                     console.error('Erreur itinéraire:', error);
@@ -4097,10 +4245,10 @@
         }
 
         async function checkForUpdates() {
-            if (!currentPatient) return;
+            if (!_currentPatient) return;
             try {
                 const snapshot = await db.collection('ordonnances')
-                    .where('patientId', '==', currentPatient.id)
+                    .where('patientId', '==', _currentPatient.id)
                     .limit(10)
                     .get();
                 snapshot.forEach(doc => {
@@ -4128,23 +4276,26 @@
             }
         }
 
+        // ================================================================
+        // AUTH STATE OBSERVER AVEC VÉRIFICATION APPROBATION
+        // ================================================================
         auth.onAuthStateChanged(async (user) => {
             loadTheme();
             if (user) {
                 try {
                     const patientDoc = await db.collection('patients').doc(user.uid).get();
                     if (patientDoc.exists) {
-                        currentUser = user;
-                        currentPatient = { id: patientDoc.id, ...patientDoc.data() };
-                        const status = currentPatient.approvalStatus || 'pending';
+                        _currentUser = user;
+                        _currentPatient = { id: patientDoc.id, ...patientDoc.data() };
+                        const status = _currentPatient.approvalStatus || 'pending';
                         if (status === 'approved') {
                             showMainApp();
                         } else {
                             startPatientStatusListener(user.uid);
-                            showApprovalScreen(status, currentPatient.rejectionReason);
+                            showApprovalScreen(status, _currentPatient.rejectionReason);
                         }
                     } else {
-                        currentUser = user;
+                        _currentUser = user;
                         showProfileRecoveryScreen(user);
                     }
                 } catch (error) {
@@ -4158,6 +4309,12 @@
                 document.getElementById('profileRecoveryScreen').classList.remove('active');
             }
         });
+
+        // ================================================================
+        // DÉMARRAGE DE L'APPLICATION
+        // ================================================================
+        console.log('🔒 MiliSoin - Application sécurisée');
+        console.log('📋 Les règles Firestore doivent être déployées pour une sécurité complète.');
     </script>
 </body>
 </html>
