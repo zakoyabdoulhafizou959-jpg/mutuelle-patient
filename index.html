@@ -113,7 +113,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .bottom-nav ul li.active a .icon .label {
     opacity: 0;
 }
-/* La bulle magique */
 .bottom-nav .indicator {
     position: absolute;
     top: -50%;
@@ -146,7 +145,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
     transform: translateY(0);
     transition-delay: 0.2s;
 }
-/* Courbes lissées */
 .bottom-nav .indicator::before {
     content: '';
     position: absolute;
@@ -169,7 +167,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
     border-top-left-radius: 20px;
     box-shadow: -1px -10px 0 0 var(--nav-bg);
 }
-/* Déplacements */
 .bottom-nav ul li:nth-child(1).active ~ .indicator { transform: translateX(calc(70px * 0)); }
 .bottom-nav ul li:nth-child(2).active ~ .indicator { transform: translateX(calc(70px * 1)); }
 .bottom-nav ul li:nth-child(3).active ~ .indicator { transform: translateX(calc(70px * 2)); }
@@ -182,7 +179,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 
 .card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
 .card-title { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-/* ====== MODE PUBLIC / DÉCOUVERTE ====== */
 .public-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); z-index: 50; display: flex; flex-direction: column; overflow: hidden; }
 .public-screen.hidden { display: none; }
 .public-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 16px; padding-top: calc(16px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); }
@@ -213,7 +209,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .public-map-container { height: 280px; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 12px; border: 2px solid var(--primary); }
 #publicMap { width: 100%; height: 100%; }
 .public-pharmacy-list { background: var(--bg-card); border-radius: 16px; padding: 12px; box-shadow: var(--shadow); max-height: 260px; overflow-y: auto; }
-/* ====== OVERLAY ACTION BLOQUÉE ====== */
 .locked-action-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s; }
 .locked-action-overlay.active { display: flex; }
 .locked-action-box { background: var(--bg-card); border-radius: 20px; padding: 24px; max-width: 380px; width: 100%; text-align: center; box-shadow: var(--shadow-lg); animation: slideUp 0.3s; }
@@ -221,7 +216,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .locked-action-box h3 { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
 .locked-action-box p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
 .locked-action-buttons { display: flex; flex-direction: column; gap: 8px; }
-/* ====== WIZARD D'INSCRIPTION ====== */
 .wizard-progress { display: flex; align-items: center; justify-content: center; padding: 16px; gap: 8px; margin-bottom: 8px; }
 .wizard-step-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--border-color); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; transition: all 0.3s; }
 .wizard-step-dot.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(44,90,160,0.3); transform: scale(1.1); }
@@ -249,7 +243,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .field-error.show { display: block; }
 .form-group input.invalid, .form-group select.invalid { border-color: var(--danger); }
 .form-group input.valid, .form-group select.valid { border-color: var(--success); }
-/* ====== AUTH ====== */
 .auth-container { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg-primary); }
 .auth-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 40px 20px 30px; text-align: center; border-radius: 0 0 30px 30px; }
 .auth-header i { font-size: 48px; margin-bottom: 10px; }
@@ -276,7 +269,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .forgot-password-link { display: block; text-align: center; font-size: 15px; color: var(--primary); text-decoration: none; margin: 12px 0; font-weight: 700; cursor: pointer; padding: 12px; background: var(--input-bg); border-radius: 10px; border: 1px solid var(--border-color); transition: all 0.2s; }
 .forgot-password-link:hover { background: rgba(44,90,160,0.1); border-color: var(--primary); }
 .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 14px; cursor: pointer; margin-bottom: 16px; background: var(--input-bg); border: none; padding: 8px 12px; border-radius: 8px; }
-/* ====== CARTE VIRTUELLE ====== */
 .virtual-card { background: #ffffff; border-radius: 20px; padding: 20px; position: relative; overflow: hidden; margin-bottom: 16px; min-height: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 1px solid #e0e0e0; }
 [data-theme="dark"] .virtual-card { background: #1c2128; border-color: #30363d; }
 .virtual-card::before { content: ''; position: absolute; top: -30%; left: -10%; width: 120%; height: 160%; background: linear-gradient(135deg, transparent 41%, rgba(224,82,6,0.25) 43%, rgba(224,82,6,0.25) 46%, rgba(255,255,255,0.7) 46%, rgba(255,255,255,0.7) 50%, rgba(13,177,53,0.25) 50%, rgba(13,177,53,0.25) 53%, transparent 55%); z-index: 0; }
@@ -298,7 +290,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 [data-theme="dark"] .card-footer { border-top-color: rgba(255,255,255,0.1); color: #e6edf3; }
 .card-number { background: #f0f4f8; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #2c5aa0; border: 1px solid #e0e0e0; }
 [data-theme="dark"] .card-number { background: #21262d; border-color: #30363d; color: #4a7fd4; }
-/* ====== STATS, ACTIONS, MAP ====== */
 .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
 .stat-card { background: var(--bg-card); border-radius: 12px; padding: 14px; text-align: center; box-shadow: var(--shadow); }
 .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); }
@@ -345,7 +336,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .pharmacy-action-btn.primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; box-shadow: 0 4px 12px rgba(44,90,160,0.3); }
 .pharmacy-action-btn.success { background: linear-gradient(135deg, #28a745, #1e7e34); color: white; box-shadow: 0 4px 12px rgba(40,167,69,0.3); }
 .pharmacy-action-btn i { font-size: 16px; }
-/* ====== ORDONNANCES ====== */
 .ord-item { background: var(--bg-card); border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); border-left: 4px solid var(--primary); }
 .ord-item.pending { border-left-color: var(--warning); }
 .ord-item.validated { border-left-color: var(--success); }
@@ -366,7 +356,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .ord-btn.primary { background: var(--primary); color: white; }
 .ord-btn.success { background: var(--success); color: white; }
 .ord-image-thumb { max-width: 100%; max-height: 200px; border-radius: 8px; margin: 10px 0; cursor: pointer; border: 1px solid var(--border-color); }
-/* ====== UPLOAD ====== */
 .image-upload-zone { border: 3px dashed var(--primary); border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--input-bg); margin-bottom: 15px; }
 .image-upload-zone:hover { background: rgba(44,90,160,0.1); border-color: var(--primary-light); }
 .image-upload-zone.dragging { background: rgba(40,167,69,0.1); border-color: var(--success); }
@@ -383,7 +372,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .progress-text { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
 .upload-progress-bar { height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
 .upload-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: width 0.3s; width: 0%; }
-/* ====== ZOOM, MODAL, NOTIF ====== */
 .image-zoom { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; cursor: pointer; }
 .image-zoom.active { display: flex; }
 .image-zoom img { max-width: 95%; max-height: 95%; border-radius: 8px; }
@@ -412,7 +400,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .notification.warning { background: var(--warning); color: #000; }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
 .empty-state i { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
-/* ====== PROFIL ====== */
 .profile-header { text-align: center; padding: 20px; background: var(--bg-card); border-radius: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
 .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; margin: 0 auto 12px; }
 .profile-name { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
@@ -432,7 +419,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .loading { display: flex; justify-content: center; padding: 20px; }
 .spinner { width: 40px; height: 40px; border: 4px solid var(--border-color); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-/* ====== APPROVAL SCREEN ====== */
 .approval-pending-screen { display: none; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #e8edf5 100%); padding: 30px 20px; text-align: center; position: relative; overflow-y: auto; overflow-x: hidden; }
 .approval-pending-screen.active { display: flex; }
 .approval-pending-screen .bg-decoration { position: absolute; border-radius: 50%; opacity: 0.1; pointer-events: none; }
@@ -478,11 +464,9 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .account-status-badge.approved { background: #d4edda; color: #155724; }
 .account-status-badge.pending { background: #fff3cd; color: #856404; }
 .account-status-badge.rejected { background: #f8d7da; color: #721c24; }
-/* ====== CONFETTI ====== */
 .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
 .confetti { position: absolute; width: 10px; height: 10px; top: -10px; animation: confettiFall linear forwards; }
 @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg) scale(0.3); opacity: 0; } }
-/* ====== RESET LINK ====== */
 .reset-link-box { margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(40,167,69,0.1), rgba(40,167,69,0.05)); border-radius: 15px; border: 2px solid #28a745; text-align: center; animation: fadeIn 0.5s; }
 .reset-link-box .email-icon { font-size: 48px; margin-bottom: 10px; }
 .reset-link-box h3 { color: #155724; margin-bottom: 10px; font-size: 16px; }
@@ -494,7 +478,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .reset-link-box .open-email-btn:active { transform: scale(0.95); }
 .reset-link-box .spam-warning { font-size: 11px; color: #856404; margin-top: 10px; background: #fff3cd; padding: 8px; border-radius: 8px; }
 .reset-link-box .resend-btn { display: inline-block; margin-top: 10px; padding: 8px 16px; background: transparent; color: #2c5aa0; border: 1px solid #2c5aa0; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
-/* ====== RECOVERY ====== */
 .profile-recovery-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%); padding: 30px 20px; text-align: center; overflow-y: auto; }
 .profile-recovery-screen.active { display: flex; }
 .recovery-icon { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #dc3545, #c0392b); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(220,53,69,0.3); }
@@ -510,7 +493,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .recovery-btn.primary { background: linear-gradient(135deg, #2c5aa0, #3d6ab5); color: white; }
 .recovery-btn.success { background: linear-gradient(135deg, #28a745, #1e7e34); color: white; }
 .recovery-btn.danger { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid #dc3545; }
-/* ====== FAQ ====== */
 .faq-item { background: var(--faq-bg); border-radius: 10px; margin-bottom: 8px; padding: 12px 16px; cursor: pointer; transition: background 0.2s; border: 1px solid var(--border-color); }
 .faq-item:hover { background: var(--border-color); }
 .faq-question { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--text-primary); font-size: 14px; }
@@ -518,18 +500,15 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 .faq-item.open .faq-question i { transform: rotate(180deg); }
 .faq-answer { display: none; padding-top: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; border-top: 1px solid var(--border-color); margin-top: 10px; }
 .faq-item.open .faq-answer { display: block; }
-/* ====== POLITIQUE ====== */
 .policy-section { margin-bottom: 16px; }
 .policy-section h4 { color: var(--primary); margin-bottom: 6px; font-size: 14px; }
 .policy-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 .policy-section ul { padding-left: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 .policy-section ul li { margin-bottom: 4px; }
-/* ====== LICENCES ====== */
 .license-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; padding: 12px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
 .license-text i { color: var(--primary); margin-right: 4px; }
 .license-text a { color: var(--primary); text-decoration: none; }
 .license-text a:hover { text-decoration: underline; }
-/* Responsive */
 @media (max-width: 380px) {
 .benefits-grid { grid-template-columns: 1fr; }
 .date-dropdowns { grid-template-columns: 1fr; }
@@ -538,7 +517,6 @@ body { background: var(--bg-primary); color: var(--text-primary); transition: ba
 </head>
 <body>
 <div class="app" id="app">
-<!-- ====== ÉCRAN PUBLIC (MODE DÉCOUVERTE) ====== -->
 <div id="publicScreen" class="public-screen">
 <div class="public-header">
 <div class="public-header-left">
@@ -610,7 +588,6 @@ Déjà membre ? <a href="#" onclick="showAuthScreen('login'); return false;" sty
 </div>
 </div>
 </div>
-<!-- ====== OVERLAY ACTION BLOQUÉE ====== -->
 <div class="locked-action-overlay" id="lockedActionOverlay">
 <div class="locked-action-box">
 <div class="locked-action-icon"><i class="fas fa-lock"></i></div>
@@ -623,7 +600,6 @@ Déjà membre ? <a href="#" onclick="showAuthScreen('login'); return false;" sty
 </div>
 </div>
 </div>
-<!-- ====== AUTH SCREEN ====== -->
 <div id="authScreen" class="auth-container" style="display:none;">
 <div class="auth-header">
 <video autoplay loop muted playsinline style="width:80px; height:80px; margin:0 auto 10px; display:block; object-fit:contain;">
@@ -640,7 +616,6 @@ Déjà membre ? <a href="#" onclick="showAuthScreen('login'); return false;" sty
 <div class="auth-tab active" data-tab="login" onclick="switchAuthTab('login')">Connexion</div>
 <div class="auth-tab" data-tab="register" onclick="switchAuthTab('register')">Inscription</div>
 </div>
-<!-- FORMULAIRE CONNEXION -->
 <form id="loginForm" class="auth-form active">
 <div class="form-group">
 <label>Email</label>
@@ -662,7 +637,6 @@ Déjà membre ? <a href="#" onclick="showAuthScreen('login'); return false;" sty
 <i class="fas fa-sign-in-alt"></i> Se connecter
 </button>
 </form>
-<!-- FORMULAIRE INSCRIPTION - WIZARD 3 ÉTAPES -->
 <form id="registerForm" class="auth-form" onsubmit="return false;">
 <div class="wizard-progress">
 <div class="wizard-step-dot active" id="wizDot1">1</div>
@@ -671,7 +645,6 @@ Déjà membre ? <a href="#" onclick="showAuthScreen('login'); return false;" sty
 <div class="wizard-step-line" id="wizLine2"></div>
 <div class="wizard-step-dot" id="wizDot3">3</div>
 </div>
-<!-- ÉTAPE 1 : Identifiants -->
 <div class="wizard-step active" id="wizStep1">
 <div class="wizard-title">
 <h3>🔐 Identifiants de connexion</h3>
@@ -711,7 +684,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 </button>
 </div>
 </div>
-<!-- ÉTAPE 2 : Infos personnelles -->
 <div class="wizard-step" id="wizStep2">
 <div class="wizard-title">
 <h3>👤 Informations personnelles</h3>
@@ -751,7 +723,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 </button>
 </div>
 </div>
-<!-- ÉTAPE 3 : Infos militaires -->
 <div class="wizard-step" id="wizStep3">
 <div class="wizard-title">
 <h3>🎖️ Informations militaires</h3>
@@ -811,7 +782,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 </div>
 </div>
 </form>
-<!-- FORMULAIRE RESET PASSWORD -->
 <form id="resetPasswordForm" class="auth-form" style="display:none;" onsubmit="return false;">
 <button type="button" class="back-link" onclick="showLoginForm()">
 <i class="fas fa-arrow-left"></i> Retour
@@ -828,7 +798,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 </form>
 </div>
 </div>
-<!-- ÉCRAN DE RÉCUPÉRATION DE PROFIL -->
 <div id="profileRecoveryScreen" class="profile-recovery-screen">
 <div class="recovery-icon"><i class="fas fa-user-slash"></i></div>
 <h2 class="recovery-title">⚠️ Profil introuvable</h2>
@@ -849,7 +818,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 </div>
 </div>
 </div>
-<!-- PAGE D'ATTENTE D'APPROBATION -->
 <div id="approvalPendingScreen" class="approval-pending-screen">
 <div class="bg-decoration d1"></div>
 <div class="bg-decoration d2"></div>
@@ -882,7 +850,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 <button class="logout-btn-pending" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Se déconnecter</button>
 </div>
 </div>
-<!-- MAIN APP -->
 <div id="mainApp" style="display:none;" class="app">
 <div class="app-header">
 <div class="header-left"><i class="fas fa-shield-alt"></i><h1>MiliSoin</h1></div>
@@ -891,7 +858,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 </div>
 </div>
 <div class="main-content">
-<!-- PAGE ACCUEIL -->
 <div class="page active" id="page-home">
 <div class="virtual-card">
 <div class="card-header-info">
@@ -936,7 +902,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 </div>
 </div>
 </div>
-<!-- PAGE CARTE -->
 <div class="page" id="page-map">
 <div class="map-container"><div id="map"></div></div>
 <div class="pharmacy-selected-panel" id="pharmacySelectedPanel">
@@ -962,14 +927,12 @@ Suivant <i class="fas fa-arrow-right"></i>
 <div class="pharmacy-list" id="pharmacyList"><div class="loading"><div class="spinner"></div></div></div>
 </div>
 </div>
-<!-- PAGE DEMANDES -->
 <div class="page" id="page-orders">
 <div class="card">
 <div class="card-title"><i class="fas fa-file-medical"></i> Mes demandes</div>
 <div id="ordersList"><div class="loading"><div class="spinner"></div></div></div>
 </div>
 </div>
-<!-- PAGE PROFIL -->
 <div class="page" id="page-profile">
 <div class="profile-header">
 <div class="profile-avatar" id="profileAvatar">?</div>
@@ -1102,7 +1065,6 @@ Suivant <i class="fas fa-arrow-right"></i>
     </ul>
 </div>
 </div>
-<!-- MODALES -->
 <div class="modal" id="sendModal">
 <div class="modal-content">
 <div class="modal-header">
@@ -1152,9 +1114,6 @@ Suivant <i class="fas fa-arrow-right"></i>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
-// ================================================================
-// CONFIGURATION FIREBASE
-// ================================================================
 const firebaseConfig = {
 apiKey: "AIzaSyCFMq3jwm78PDlS55VP4AcwTIDpH3ZINbI",
 authDomain: "service-mutuel.firebaseapp.com",
@@ -1167,9 +1126,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ================================================================
-// UTILITAIRES
-// ================================================================
 function escapeHtml(text) {
 if (!text) return '';
 const div = document.createElement('div');
@@ -1207,9 +1163,6 @@ notif.innerHTML = `<i class="fas fa-${icons[type]}"></i> ${escapeHtml(message)}`
 setTimeout(() => notif.classList.remove('show'), 3000);
 }
 
-// ================================================================
-// VARIABLES GLOBALES
-// ================================================================
 let currentUser = null;
 let currentPatient = null;
 let myOrdonnances = [];
@@ -1228,9 +1181,6 @@ let bgCheckInterval = null;
 let lastKnownStatuses = {};
 let patientStatusListener = null;
 
-// ================================================================
-// MODE PUBLIC / DÉCOUVERTE
-// ================================================================
 function showPublicScreen() {
 document.getElementById('publicScreen').classList.remove('hidden');
 document.getElementById('authScreen').style.display = 'none';
@@ -1272,9 +1222,6 @@ function closeLockedAction() {
 document.getElementById('lockedActionOverlay').classList.remove('active');
 }
 
-// ================================================================
-// CARTE PUBLIQUE
-// ================================================================
 async function initPublicMap() {
 if (publicMap) {
 setTimeout(() => publicMap.invalidateSize(), 100);
@@ -1356,9 +1303,6 @@ publicPharmacyMarkers.push(marker);
 }
 }
 
-// ================================================================
-// WIZARD D'INSCRIPTION
-// ================================================================
 let wizardState = { step: 1 };
 function resetWizard() {
 wizardState.step = 1;
@@ -1550,9 +1494,6 @@ btn.innerHTML = '<i class="fas fa-check-circle"></i> Terminer l\'inscription';
 }
 }
 
-// ================================================================
-// TOGGLE PASSWORD
-// ================================================================
 function togglePassword(fieldId, btn) {
 const field = document.getElementById(fieldId);
 const icon = btn.querySelector('i');
@@ -1567,9 +1508,6 @@ icon.classList.add('fa-eye');
 }
 }
 
-// ================================================================
-// AUTHENTIFICATION (LOGIN)
-// ================================================================
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 try {
@@ -1604,9 +1542,6 @@ notify(msg, 'error');
 }
 });
 
-// ================================================================
-// RESET PASSWORD
-// ================================================================
 function showResetPassword() {
 document.querySelectorAll('.auth-form').forEach(f => { f.style.display = 'none'; f.classList.remove('active'); });
 document.getElementById('resetPasswordForm').style.display = 'block';
@@ -1679,9 +1614,6 @@ btn.innerHTML = '<i class="fas fa-envelope"></i> Envoyer le lien de réinitialis
 }
 }
 
-// ================================================================
-// NOTIFICATIONS
-// ================================================================
 function getNotifSettings() {
 const saved = localStorage.getItem('milisoin_notif_settings');
 if (saved) return JSON.parse(saved);
@@ -1768,9 +1700,6 @@ showNativeNotification('MiliSoin - Test', '🔔 Les notifications fonctionnent !
 notify('🔔 Notification de test envoyée', 'success');
 }
 
-// ================================================================
-// APPLICATION PRINCIPALE
-// ================================================================
 function showMainApp() {
 if (!currentPatient || currentPatient.approvalStatus !== 'approved') {
 console.warn('⛔ Tentative de contournement détectée !');
@@ -1931,22 +1860,13 @@ showApprovalScreen('pending');
 });
 }
 
-// ================================================================
-// NAVIGATION (VERSION AMÉLIORÉE AVEC LABEL DYNAMIQUE)
-// ================================================================
 function switchPage(page) {
-// Gestion des pages
 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 document.getElementById('page-' + page).classList.add('active');
-
-// Gestion des onglets actifs
 const navItems = document.querySelectorAll('.bottom-nav ul li.nav-item');
 navItems.forEach(n => n.classList.remove('active'));
-
 const pageIndex = { home: 0, map: 1, orders: 2, profile: 3 }[page];
 if (navItems[pageIndex]) navItems[pageIndex].classList.add('active');
-
-// Mise à jour du label dans la bulle
 const labels = { home: 'Accueil', map: 'Carte', orders: 'Demandes', profile: 'Profil' };
 const indicatorLabel = document.getElementById('indicatorLabel');
 if (indicatorLabel) {
@@ -1956,17 +1876,12 @@ indicatorLabel.textContent = labels[page] || '';
 indicatorLabel.style.opacity = '1';
 }, 150);
 }
-
-// Actions spécifiques aux pages
 if (page === 'map') setTimeout(() => initMap(), 100);
 if (page === 'orders') loadOrders();
 }
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-// ================================================================
-// ORDONNANCES
-// ================================================================
 function startOrdonnancesListener() {
 if (!currentPatient) return;
 if (unsubscribeOrdonnances) unsubscribeOrdonnances();
@@ -2145,9 +2060,6 @@ downloadBtn.style.display = 'none';
 openModal('detailModal');
 }
 
-// ================================================================
-// GESTION DES IMAGES
-// ================================================================
 const imageInput = document.getElementById('ordonnanceImageInput');
 const imageUploadZone = document.getElementById('imageUploadZone');
 const imagePreviewContainer = document.getElementById('imagePreviewContainer');
@@ -2266,9 +2178,6 @@ progressFill.style.width = '0%';
 }
 }
 
-// ================================================================
-// PDF AVEC QR CODE
-// ================================================================
 async function downloadPDF(ordId) {
 const ord = myOrdonnances.find(o => o.id === ordId);
 if (!ord) { notify('❌ Ordonnance non trouvée', 'error'); return; }
@@ -2426,9 +2335,6 @@ notify('❌ Erreur lors de la génération du PDF: ' + error.message, 'error');
 }
 }
 
-// ================================================================
-// PHARMACIES & MAP
-// ================================================================
 async function loadPharmacies() {
 if (allPharmacies.length > 0) { updatePharmacyList(); return; }
 await loadPublicPharmacies();
@@ -2578,9 +2484,6 @@ if (!selectedPharmacy.phone) { notify('⚠️ Numéro non disponible', 'warning'
 window.location.href = `tel:${selectedPharmacy.phone}`;
 }
 
-// ================================================================
-// BACKGROUND CHECKS
-// ================================================================
 function startBackgroundChecks() {
 document.addEventListener('visibilitychange', () => {
 const settings = getNotifSettings();
@@ -2614,9 +2517,6 @@ lastKnownStatuses[data.id] = data.status;
 } catch (e) { console.error('BG check:', e); }
 }
 
-// ================================================================
-// THEME
-// ================================================================
 function setTheme(theme) {
 document.documentElement.setAttribute('data-theme', theme);
 localStorage.setItem('milisoin-theme', theme);
@@ -2639,9 +2539,6 @@ const saved = localStorage.getItem('milisoin-theme') || 'light';
 setTheme(saved);
 }
 
-// ================================================================
-// AUTH STATE OBSERVER
-// ================================================================
 auth.onAuthStateChanged(async (user) => {
 loadTheme();
 if (user) {
@@ -2665,9 +2562,6 @@ showPublicScreen();
 }
 });
 
-// ================================================================
-// RECHERCHE PROFIL
-// ================================================================
 async function searchProfileByEmail() {
 if (!currentUser || !currentUser.email) { notify('❌ Email non disponible', 'error'); return; }
 notify('🔍 Recherche du profil par email...', 'info');
@@ -2747,8 +2641,8 @@ notify('❌ Erreur: ' + error.message, 'error');
 }
 async function createMinimalProfile() {
 if (!currentUser) { notify('❌ Vous devez être connecté', 'error'); return; }
-if (!confirm('Créer un profil minimal ?
-Vous devrez ensuite contacter l\'administrateur pour compléter vos informations.')) return;
+// CORRECTION ICI : \n au lieu d'un vrai saut de ligne
+if (!confirm('Créer un profil minimal ?\nVous devrez ensuite contacter l\'administrateur pour compléter vos informations.')) return;
 notify('🔄 Création du profil minimal...', 'info');
 try {
 const minimalProfile = {
@@ -2771,8 +2665,8 @@ notify('❌ Erreur: ' + error.message, 'error');
 }
 }
 async function deleteAccountAndRestart() {
-if (!confirm('⚠️ Supprimer définitivement votre compte ?
-Cette action est irréversible !')) return;
+// CORRECTION ICI : \n au lieu d'un vrai saut de ligne
+if (!confirm('⚠️ Supprimer définitivement votre compte ?\nCette action est irréversible !')) return;
 if (!confirm('🔴 DERNIÈRE CONFIRMATION : Toutes vos données seront perdues. Continuer ?')) return;
 notify('🗑️ Suppression du compte...', 'info');
 try {
@@ -2806,12 +2700,9 @@ myOrdonnances = [];
 showPublicScreen();
 }
 
-// ================================================================
-// INIT
-// ================================================================
 getUserLocation();
 populateDateDropdowns();
-console.log('🔒 MiliSoin v3.1 - Navigation Magique intégrée');
+console.log('🔒 MiliSoin v3.1 - Navigation Magique intégrée (Corrigé)');
 </script>
 </body>
 </html>
